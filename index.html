@@ -1,18 +1,192 @@
 <!DOCTYPE html>
-<html>
-<head><title>RD's Page</title></head>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RD's Page</title>
+  <style>
+    /* 全局样式 */
+    body {
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+      line-height: 1.7;
+      color: #333;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+      min-height: 100vh;
+    }
+    
+    /* 头部样式 */
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+    }
+    
+    h1 {
+      color: #1e40af;
+      margin-bottom: 0.5rem;
+      font-size: 2.5rem;
+      background: linear-gradient(90deg, #1e40af, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    h2 {
+      color: #374151;
+      margin-top: 2.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+    }
+    
+    p {
+      font-size: 1.1rem;
+      color: #4b5563;
+      margin-bottom: 1.2rem;
+    }
+    
+    /* 主要内容区域 */
+    .main-content {
+      background: white;
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+    }
+    
+    /* 按钮容器 */
+    .button-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+      margin: 2.5rem 0;
+    }
+    
+    /* 按钮样式 - 简约边框按钮 */
+    .outline-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 28px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #3b82f6;
+      background: white;
+      border: 2px solid #3b82f6;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 200px;
+      text-decoration: none;
+    }
+    
+    .outline-btn:hover {
+      background: #3b82f6;
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(59, 130, 246, 0.3);
+    }
+    
+    
+    /* 按钮图标 */
+    .btn-icon {
+      font-size: 1.3rem;
+    }
+    
+    /* 特色区域 */
+    .feature-box {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-radius: 12px;
+      padding: 1.8rem;
+      margin-top: 2rem;
+      border-left: 5px solid #3b82f6;
+    }
+    
+    .feature-box h3 {
+      color: #1e40af;
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    
+    /* 电影列表区域 */
+    .movie-list {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border-radius: 12px;
+      text-align: center;
+      border: 2px dashed #f59e0b;
+    }
+    
+    /* 页脚 */
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e5e7eb;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .main-content {
+        padding: 1.5rem;
+      }
+      
+      .button-container {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .outline-btn {
+        width: 100%;
+        max-width: 300px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
 <body>
-    <h1>你好，世界！我是怒吼的蒲公英(RoaringDandelion)!</h1>
+  <header>
+    <h1>你好，世界！</h1>
+    <h2>我是怒吼的蒲公英 (RoaringDandelion)!</h2>
+  </header>
     <p>这是我利用 GitHub Pages 生成的第一个网站。</p>
     <p>我要认真学习博客技术，分享我的生活！</p>
+	<p>其实都是大模型在帮我~^_^~</p>
+  <div class="main-content">
+    <h2>我的生活记录</h2>
+    <p>点击下方按钮查看我的生活记录：</p>
+    
+    <div class="button-container">
+      <a href="gamelife.html" target="_blank" class="outline-btn">
+        <span class="btn-icon">🎮</span>
+        我的游戏生活
+      </a>
+      
+      <a href="movielife.html" target="_blank" class="outline-btn">
+        <span class="btn-icon">🎬</span>
+        我的电影记录
+      </a>
+    </div>
+    </div>
 
-    <p>下面是我的测试。</p>
-<!-- 新窗口打开 -->
-<button onclick="window.open('gamelife.html', '_blank')">
-  我的游戏生活
-</button>
-<button onclick="window.open('movielife.html', '_blank')">
-  我的电影记录
-</button>
+  
+  <footer>
+    <p>© 2026 RoaringDandelion | 由 GitHub Pages 托管</p>
+  </footer>
 </body>
 </html>

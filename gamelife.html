@@ -1,8 +1,72 @@
 <!DOCTYPE html>
-<html>
-<head><title>RD's GameLife</title></head>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RD's Game Life</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .header {
+      text-align: center;
+      color: #2563eb;
+      margin-bottom: 2rem;
+    }
+    .game-list {
+      margin: 2rem 0;
+      padding: 1rem;
+      background: #f0f9ff;
+      border-radius: 8px;
+	  text-align: center; /* 让容器内所有内容居中 */
+    }
+	table {
+		margin: 0 auto; 
+		border-collapse: separate;
+		border-spacing: 15px; /* 水平和垂直都是15px间距 */
+	}
+
+	th, td {
+		padding: 15px; /* 增加内边距 */
+		text-align: center; /* 单元格内文字居中 */
+		/* border: 1px solid #ddd; */  /* 可选：添加边框 */
+	}
+  </style>
+</head>
 <body>
-    <h1>2026年全成就游戏</h1>
-    <p>逆转检察官御剑精选集  XBOX  </p>
+  <header class="header">
+    <h1>2026全成就游戏记录</h1>
+    <p>RoaringDandelion</p>
+  </header>
+  <div class="game-list">
+	
+	<table>
+        <tr>
+			<th>编号</th>
+            <th>游戏名</th>
+            <th>平台</th>
+            <th>全成就时长</th>
+			<th>完成日期</th>
+        </tr>
+		<tr>
+			<td>1</td>
+            <td>逆转检察官1&2 御剑精选集 </td>
+            <td>XBOX</td>
+            <td>43 Hours</td>
+			<td>2026/01/14</td>
+        </tr>
+        <tr>
+			<td colspan="5">...To Be Continued...</td>
+        </tr>
+        
+    </table>
+  </div>
+
 </body>
 </html>
+
+
