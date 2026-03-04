@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>阿西莫夫银河帝国15部曲 - 创作时间线</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+      line-height: 1.6;
+      background: #f8fafc;
+      color: #333;
+    }
+    .header {
+      text-align: center;
+      color: #1e40af;
+      margin-bottom: 2rem;
+    }
+    
+    .milestone-box {
+      background: #eff6ff;
+      border-left: 5px solid #3b82f6;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+      color: #1e3a8a;
+    }
+
+    /* 筛选器样式 */
+    .controls {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 1rem;
+      gap: 10px;
+    }
+    .controls label {
+      font-weight: bold;
+      color: #1e40af;
+    }
+    .controls select {
+      padding: 8px 12px;
+      border: 2px solid #bfdbfe;
+      border-radius: 8px;
+      background: white;
+      color: #1e40af;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .table-container {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      overflow-x: auto;
+    }
+    table {
+      width: 100%; 
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 15px; 
+      text-align: left; 
+      border-bottom: 1px solid #e2e8f0;
+    }
+    th {
+      color: #1e40af; 
+      cursor: pointer; 
+      user-select: none; 
+      white-space: nowrap; 
+      background: #f1f5f9;
+    }
+    th:hover { background-color: #dbeafe; }
+    
+    /* 标签颜色 */
+    .badge {
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+    .badge-Foundation { background: #dbeafe; color: #1e40af; }
+    .badge-Robot { background: #dcfce7; color: #166534; }
+    .badge-Empire { background: #fef3c7; color: #92400e; }
+
+    .eng-title {
+      font-size: 0.85em;
+      color: #64748b;
+      display: block;
+    }
+    
+    .death-row td {
+      text-align: center;
+      background: #f8fafc;
+      color: #64748b;
+      font-style: italic;
+      border-left: 4px solid #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <h1>🌌 阿西莫夫银河帝国 15 部曲创作时间线</h1>
+    <p>创作出版时间线全记录</p>
+  </header>
+  
+  <p style="text-align: center;"><strong>创作时间顺序</strong></p>
+  <div class="milestone-box">
+    <p><strong>阿西莫夫的银河帝国系列共15部，分为3个子系列：</strong></p>
+    <p><strong>1. 基地系列（共七部，包含正传三部、前传后传各两部）</strong></p>
+    <p><strong>2. 机器人系列（共五部）</strong></p>
+    <p><strong>3. 银河帝国系列（共三部）</strong></p>
+    <p style="margin: 5px 0 0;">关于这些小说的“杂志连载史”（创作时间），整理如下：</p>
+	  <li><strong>1940 - 1950：</strong> 短篇集《我，机器人》中的 9 篇故事大多在 1940 年至 1950 年间首发于各大科幻杂志。</li>
+	  <li><strong>1942 - 1950：</strong> 基地三部曲最初以中短篇小说的形式于 1942 年 5 月至 1950 年 1 月期间在《惊奇科幻小说》（Astounding Science Fiction）杂志上连载发表。</li>
+      <li><strong>1951：</strong> 《繁星若尘》出版成书之前，它曾以《暴君》（Tyrann）为名，于 1951 年 1 月、2 月和 3 月在《银河科幻小说》（Galaxy Science Fiction）杂志上连载。</li>
+      <li><strong>1952：</strong> 《星空暗流》于 1952 年 10 月、11 月和 12 月在《惊奇科幻小说》（Astounding Science Fiction）上完成了分三期的连载。</li>
+	  <li><strong>1953：</strong> 《钢穴》在 1954 年出版实体书之前，于 1953 年 10 月至 12 月在《银河科幻小说》（Galaxy Science Fiction）杂志上进行了连载。</li>
+      <li><strong>1956：</strong> 《裸阳》于 1956 年 10 月至 12 月在《惊奇科幻小说》（Astounding Science Fiction）上连载，随后于 1957 年集结成书。</li>
+      <li><strong>20世纪80年代：</strong> 阿西莫夫创作基地后传与前传时，已是享誉全球的畅销书作家，这些作品大多直接以实体书形式出版，不再依赖早期的杂志连载模式。	</li>
+    
+  </div>
+
+  <p style="text-align: center;"><strong>出版时间顺序</strong></p>
+  <div class="controls">
+    <label for="seriesFilter">筛选系列：</label>
+    <select id="seriesFilter" onchange="filterData()">
+      <option value="All">全部系列</option>
+      <option value="Foundation">基地系列 (Foundation)</option>
+      <option value="Robot">机器人系列 (Robot)</option>
+      <option value="Empire">银河帝国三部曲 (Empire)</option>
+    </select>
+  </div>
+
+  <div class="table-container">
+    <table id="booksTable">
+      <thead>
+        <tr>
+          <th onclick="applySort('year')">出版年份</th>
+          <th onclick="applySort('series')">所属系列</th>
+          <th onclick="applySort('title')">中文书名 / 英文原名</th>
+          <th>备注</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const asimovBooks = [
+      { year: 1950, series: "Robot", seriesName: "机器人系列", title: "我，机器人", engTitle: "I, Robot", note: "短篇集" },
+      { year: 1950, series: "Empire", seriesName: "银河帝国系列", title: "苍穹一粟", engTitle: "Pebble in the Sky", note: "" },
+      { year: 1951, series: "Foundation", seriesName: "基地系列", title: "基地", engTitle: "Foundation", note: "正传三部曲 1" },
+      { year: 1951, series: "Empire", seriesName: "银河帝国系列", title: "繁星若尘", engTitle: "The Stars Like Dust", note: "" },
+      { year: 1952, series: "Foundation", seriesName: "基地系列", title: "基地与帝国", engTitle: "Foundation and Empire", note: "正传三部曲 2" },
+      { year: 1952, series: "Empire", seriesName: "银河帝国系列", title: "星空暗流", engTitle: "The Currents of Space", note: "" },
+      { year: 1953, series: "Foundation", seriesName: "基地系列", title: "第二基地", engTitle: "Second Foundation", note: "正传三部曲 3" },
+      { year: 1954, series: "Robot", seriesName: "机器人系列", title: "钢穴", engTitle: "The Caves of Steel", note: "" },
+      { year: 1957, series: "Robot", seriesName: "机器人系列", title: "裸阳", engTitle: "The Naked Sun", note: "" },
+      { year: 1982, series: "Foundation", seriesName: "基地系列", title: "基地边缘", engTitle: "Foundation's Edge", note: "续传 1" },
+      { year: 1983, series: "Robot", seriesName: "机器人系列", title: "曙光中的机器人", engTitle: "The Robots of Dawn", note: "" },
+      { year: 1985, series: "Robot", seriesName: "机器人系列", title: "机器人与帝国", engTitle: "Robots and Empire", note: "" },
+      { year: 1986, series: "Foundation", seriesName: "基地系列", title: "基地与地球", engTitle: "Foundation and Earth", note: "续传 2" },
+      { year: 1988, series: "Foundation", seriesName: "基地系列", title: "基地前奏", engTitle: "Prelude to Foundation", note: "前传 1" },
+      { year: 1993, series: "Foundation", seriesName: "基地系列", title: "迈向基地", engTitle: "Forward the Foundation", note: "前传 2 / 遗作" }
+    ];
+
+    const deathEvent = { isEvent: true, year: 1992, text: "1992年 艾萨克·阿西莫夫逝世" };
+
+    let currentSortKey = 'year';
+    let isAscending = true;
+    let currentFilter = 'All';
+
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      // 1. 过滤数据
+      let displayData = currentFilter === 'All' 
+        ? [...asimovBooks] 
+        : asimovBooks.filter(b => b.series === currentFilter);
+
+      // 2. 排序书籍
+      displayData.sort((a, b) => {
+        let valA = a[currentSortKey];
+        let valB = b[currentSortKey];
+        if (currentSortKey === 'year') return isAscending ? a.year - b.year : b.year - a.year;
+        return isAscending ? String(valA).localeCompare(String(valB), 'zh') : String(valB).localeCompare(String(valA), 'zh');
+      });
+
+      // 3. 如果是“全部”且按“年份”排序，插入逝世事件
+      if (currentFilter === 'All' && currentSortKey === 'year') {
+        const insertIndex = displayData.findIndex(b => isAscending ? b.year > 1992 : b.year < 1992);
+        if (insertIndex !== -1) displayData.splice(insertIndex, 0, deathEvent);
+        else displayData.push(deathEvent);
+      }
+
+      // 4. 生成 HTML
+      displayData.forEach(item => {
+        if (item.isEvent) {
+          tbody.innerHTML += `<tr class="death-row"><td colspan="4">🕊️ ${item.text}</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML += `
+          <tr>
+            <td style="font-weight: bold;">${item.year}</td>
+            <td><span class="badge badge-${item.series}">${item.seriesName}</span></td>
+            <td><strong>${item.title}</strong><span class="eng-title">${item.engTitle}</span></td>
+            <td>${item.note}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function filterData() {
+      currentFilter = document.getElementById('seriesFilter').value;
+      renderTable();
+    }
+
+    function applySort(key) {
+      if (currentSortKey === key) isAscending = !isAscending;
+      else { currentSortKey = key; isAscending = true; }
+      renderTable();
+    }
+
+    // 首次加载
+    renderTable();
+  </script>
+</body>
+</html>
