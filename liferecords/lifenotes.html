@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>生活记录 - RoaringDandelion</title>
+  <style>
+    /* 沿用主页的配色和字体 */
+    body {
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      line-height: 1.7;
+      color: #333;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    h1 {
+      color: #1e40af;
+      background: linear-gradient(90deg, #1e40af, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* 返回按钮 */
+    .back-link {
+      display: inline-block;
+      margin-bottom: 2rem;
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    /* 博客列表容器 */
+    .blog-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* 博客条目卡片样式 */
+    .blog-item {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+      border-left: 5px solid #3b82f6;
+    }
+
+    .blog-item:hover {
+      transform: translateX(10px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15);
+    }
+
+    .blog-date {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-bottom: 0.5rem;
+    }
+
+    .blog-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #1e40af;
+      margin-bottom: 0.5rem;
+    }
+
+    .blog-summary {
+      font-size: 0.95rem;
+      color: #4b5563;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="../index.html" class="back-link">← 返回首页</a>
+    <h1>📝 RD's 生活记录</h1>
+    <p>记录日常点滴，分享此时此刻。</p>
+  </header>
+
+  <div class="blog-list">
+    <a href="Lifenotes/Allachievementslists/Gamelife_allachivementslist.html" class="blog-item">
+      <div class="blog-date">2026年3月5日</div>
+      <div class="blog-title">生涯全成就游戏总记录</div>
+      <div class="blog-summary">我的所有全成就游戏记录，从2022年开始至今。。。</div>
+    </a>
+
+    <a href="posts/2026-02-28-spring-walk.html" class="blog-item">
+      <div class="blog-date">2026年2月28日</div>
+      <div class="blog-title">早春散步：发现路边的第一朵蒲公英</div>
+      <div class="blog-summary">天气转暖了，出门走了一圈。作为“怒吼的蒲公英”，我决定拍下它的照片...</div>
+    </a>
+
+    <div style="text-align: center; padding: 2rem; color: #9ca3af; font-style: italic;">
+      更多精彩内容正在码字中...
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 RoaringDandelion</p>
+  </footer>
+
+</body>
+</html>

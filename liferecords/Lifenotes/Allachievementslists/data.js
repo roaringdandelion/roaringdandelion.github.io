@@ -1,0 +1,22 @@
+const gamesData = [
+  { id: 1, name: "女神异闻录5皇家版", engName: "Persona 5 Royal", platform: "XBOX", duration: 146, date: "2022/11/12", url: 'https://asia.sega.com/persona-remaster/p5r/cht/' },
+  { id: 2, name: "城镇叠叠乐", engName: "Townscaper", platform: "XBOX", duration: 3.5, date: "2022/11/16", url: 'https://www.townscapergame.com/' },
+  { id: 3, name: "日落黄昏时", engName: "As Dusk Falls", platform: "XBOX", duration: 25.4, date: "2022/11/23", url: 'https://www.xbox.com/zh-CN/games/store/44ck5pel6jc96bue5pip5pe244cl/9nr7xdnvp5sw' },
+  { id: 4, name: "人中之龙7外传 无名之龙", engName: "Like a Dragon Gaiden: The Man Who Erased His Name", platform: "XBOX", duration: 51, date: "2023/12/14", url: 'https://ryu-ga-gotoku.com/gaiden/cn/' },
+  { id: 5, name: "花园故事", engName: "Garden Story", platform: "XBOX", duration: 26.1, date: "2024/01/12", url: 'https://www.xbox.com/zh-CN/games/store/6iqx5zut5pwf5lql/9PP09MJRH2XD/0010' },
+  { id: 6, name: "摄影冒险", engName: "TOEM", platform: "XBOX", duration: 11.9, date: "2024/07/12", url: 'https://store.steampowered.com/app/1307580/TOEM_A_Photo_Adventure/' },
+  { id: 7, name: "深入", engName: "INSIDE", platform: "XBOX", duration: 7.2, date: "2024/08/04", url: 'https://www.xbox.com/en-US/games/store/inside/C17GQF31D617' },
+  { id: 8, name: "女神异闻录3Reload", engName: "Persona 3 Reload", platform: "XBOX", duration: 184.8, date: "2024/10/04", url: 'https://asia.sega.com/p3r/cht/' },
+  { id: 9, name: "女神异闻录4黄金版", engName: "Persona 4 Golden", platform: "XBOX", duration: 244.2, date: "2025/02/07", url: 'https://asia.sega.com/persona-remaster/p4g/cht/' },
+  { id: 10, name: "逆转裁判123成步堂精选集", engName: "Phoenix Wright: Ace Attorney Trilogy", platform: "XBOX", duration: 80.4, date: "2025/02/21", url: 'https://www.capcom-games.com/product/zh-hans/aceattorney-trilogy-app/' },
+  { id: 11, name: "人中之龙7 光与暗的去向", engName: "Yakuza: Like a Dragon", platform: "XBOX", duration: 171.5, date: "2025/04/19", url: 'https://asia.sega.com/ryu-ga-gotoku/seven/cn/international/' },
+  { id: 12, name: "死亡搁浅 导演剪辑版", engName: "Death Stranding Director's Cut", platform: "XBOX", duration: 146.7, date: "2025/06/09", url: 'https://www.kojimaproductions.jp/zh-hans/death-stranding-dc' },
+  { id: 13, name: "光与影：33号远征队", engName: "Clair Obscur: Expedition 33", platform: "XBOX", duration: 324.2, date: "2025/08/27", url: 'https://www.xbox.com/zh-CN/games/store/33/9PPT8K6GQHRZ' },
+  { id: 14, name: "暗喻幻想：ReFantazio", engName: "Metaphor: ReFantazio", platform: "XBOX", duration: 402.9, date: "2025/11/23", url: 'https://asia.sega.com/metaphor/cn/' },
+  { id: 15, name: "黑神话：悟空", engName: "Black Myth: Wukong", platform: "Steam", duration: 83, date: "2025/12/27", url: 'https://gamesci.cn/wukong/' },
+  { id: 16, name: "逆转检察官1&2 御剑精选集", engName: "Ace Attorney Investigations Collection", platform: "XBOX", duration: 43, date: "2026/01/14", url: 'https://www.ace-attorney.com/investigations1-2/zh-hans/' },
+  { id: 17, name: "吸血鬼幸存者", engName: "Vampire Survivors", platform: "XBOX", duration: 114, date: "2026/02/08", url: 'https://www.xbox.com/en-us/games/store/Vampire-Survivors/9PD5BM2Z8C4L' },
+  { id: 18, name: "剑星", engName: "Stellar Blade", platform: "Steam", duration: 64.5, date: "2026/02/11", url: 'https://store.steampowered.com/agecheck/app/3489700/?l=schinese' },
+  { id: 19, name: "隐形守护者", engName: "The Invisible Guardian", platform: "Steam", duration: 32, date: "2026/02/11", url: 'https://store.steampowered.com/app/998940/_The_Invisible_Guardian/' },
+  { id: 20, name: "人中之龙8外传 Pirates in Hawaii", engName: "Like a Dragon: Pirate Yakuza in Hawaii", platform: "XBOX", duration: 50, date: "2026/02/28", url: 'https://ryu-ga-gotoku.com/pirate/cn/' }
+];
