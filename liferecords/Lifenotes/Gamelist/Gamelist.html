@@ -1,1 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RD's Game Life - XBOX已购游戏总记录</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .header {
+      text-align: center;
+      color: #16a34a; 
+      margin-bottom: 2rem;
+    }
+    .game-list {
+      margin: 2rem 0;
+      padding: 1rem;
+      background: #f0fdf4; 
+      border-radius: 8px;
+    }
+    
+    .filter-container {
+      text-align: right;
+      margin-bottom: 10px;
+      padding-right: 15px;
+      color: #166534;
+      font-weight: bold;
+    }
+    .filter-container select {
+      padding: 6px 12px;
+      border: 1px solid #86efac;
+      border-radius: 6px;
+      background-color: white;
+      color: #166534;
+      font-family: inherit;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+    .filter-container select:focus {
+      outline: none;
+      border-color: #16a34a;
+    }
 
+    table {
+      margin: 0 auto; 
+      border-collapse: separate;
+      border-spacing: 15px;
+      width: 100%; 
+    }
+    th, td {
+      padding: 15px; 
+      text-align: center; 
+    }
+    th {
+      border-bottom: 2px solid #86efac; 
+      color: #166534; 
+      cursor: pointer; 
+      user-select: none; 
+      transition: background-color 0.2s;
+      white-space: nowrap; 
+    }
+    th:hover {
+      background-color: #dcfce7;
+      border-radius: 8px;
+    }
+    th::after {
+      content: ' \21D5'; 
+      font-size: 0.8em;
+      color: #86efac;
+      margin-left: 5px;
+    }
+    .year-divider td {
+      font-weight: bold;
+      color: #16a34a; 
+      font-size: 1.1em;
+      padding-top: 30px;
+      padding-bottom: 5px;
+      border-bottom: 1px dashed #bbf7d0; 
+    }
+    .footer-row td {
+      padding-top: 40px; 
+      color: #64748b; 
+      font-style: italic;
+    }
+    
+    .custom-link {
+      color: inherit; 
+      text-decoration: none; 
+      transition: color 0.2s ease, font-weight 0.2s ease;
+      display: inline-block;
+    }
+    .custom-link:hover {
+      color: #15803d; 
+      font-weight: bold;
+    }
+    .game-name-link {
+      border-bottom: 1px dotted #16a34a;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>XBOX已购游戏库总记录</h1>
+    <p>RoaringDandelion</p>
+  </header>
+  
+  <div class="game-list">
+    <div class="filter-container">
+      <label for="platformFilter">平台检索：</label>
+      <select id="platformFilter" onchange="filterTable()">
+        <option value="All">全部平台</option>
+        <option value="Windows">Windows</option>
+        <option value="XPA">XPA</option>
+        <option value="Console">Console</option>
+      </select>
+    </div>
+	
+    <table id="gameTable">
+      <thead>
+        <tr>
+          <th onclick="sortTable('id')">编号</th>
+          <th onclick="sortTable('name')">游戏名</th>
+          <th onclick="sortTable('platform')">平台</th>
+          <th onclick="sortTable('date')">购买日期</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        </tbody>
+    </table>
+  </div>
+
+  <script src="data.js"></script>
+
+  <script>
+    const tbody = document.getElementById('tableBody');
+    let currentData = []; 
+    let currentSortKey = '';
+    let isAscending = false;
+
+    function renderTable(data, showYearGroup = false) {
+      tbody.innerHTML = ''; 
+      let currentYear = '';
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="padding: 30px; color: #64748b;">该平台暂无已购记录</td></tr>`;
+        return;
+      }
+
+      data.forEach(game => {
+        if (showYearGroup) {
+          const gameYear = game.date.split('/')[0];
+          if (gameYear && gameYear !== currentYear) {
+            currentYear = gameYear;
+            tbody.innerHTML += `
+              <tr class="year-divider">
+                <td colspan="4">${currentYear}年度</td>
+              </tr>
+            `;
+          }
+        }
+
+        const gameUrl = game.url ? game.url : '#';
+        const engNameAttr = game.engName ? `title="${game.engName}"` : '';
+
+        // 渲染 4 列数据
+        tbody.innerHTML += `
+          <tr>
+            <td>${game.id}</td>
+            <td>
+              <a href="${gameUrl}" target="_blank" class="custom-link game-name-link" ${engNameAttr}>
+                ${game.name}
+              </a>
+            </td>
+            <td>${game.platform}</td>
+            <td>${game.date}</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML += `
+        <tr class="footer-row">
+          <td colspan="4">...To Be Continued...</td>
+        </tr>
+      `;
+    }
+
+    function filterTable() {
+      const platform = document.getElementById('platformFilter').value;
+      currentSortKey = '';
+      isAscending = false;
+
+      if (platform === 'All') {
+        currentData = [...gamesData];
+      } else {
+        currentData = gamesData.filter(game => game.platform === platform);
+      }
+      renderTable(currentData, true);
+    }
+
+    function sortTable(key) {
+      if (currentSortKey === key) {
+        isAscending = !isAscending;
+      } else {
+        currentSortKey = key;
+        isAscending = true; 
+      }
+
+      currentData.sort((a, b) => {
+        let valA = a[key];
+        let valB = b[key];
+
+        if (key === 'id') {
+          let numA = parseFloat(valA) || 0; 
+          let numB = parseFloat(valB) || 0;
+          return isAscending ? numA - numB : numB - numA;
+        } 
+        else if (key === 'date') {
+          // 如果日期为空，放到最后
+          if (!valA) return isAscending ? 1 : -1;
+          if (!valB) return isAscending ? -1 : 1;
+          
+          let dateA = new Date(valA).getTime();
+          let dateB = new Date(valB).getTime();
+          return isAscending ? dateA - dateB : dateB - dateA;
+        } 
+        else {
+          return isAscending 
+            ? String(valA).localeCompare(String(valB), 'zh') 
+            : String(valB).localeCompare(String(valA), 'zh');
+        }
+      });
+
+      renderTable(currentData, false); 
+    }
+
+    window.onload = function() {
+      // 检查是否成功加载了 gamesData
+      if (typeof gamesData !== 'undefined') {
+        currentData = [...gamesData];
+        renderTable(currentData, true);
+      } else {
+        tbody.innerHTML = `<tr><td colspan="4" style="padding: 30px; color: red;">未读取到数据，请先运行 Python 脚本生成 data.js</td></tr>`;
+      }
+    };
+  </script>
+</body>
+</html>
