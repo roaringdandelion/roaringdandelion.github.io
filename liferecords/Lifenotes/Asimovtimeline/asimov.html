@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>阿西莫夫银河帝国15部曲 - 创作时间线</title>
   <style>
+    /* 1. 全局盒子模型重置 */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: system-ui, -apple-system, sans-serif;
       max-width: 900px;
@@ -30,7 +35,6 @@
       color: #1e3a8a;
     }
 
-    /* 筛选器样式 */
     .controls {
       display: flex;
       justify-content: flex-end;
@@ -52,32 +56,45 @@
       font-weight: 500;
     }
 
+    /* 2. 核心优化：表格容器变身为独立视窗 */
     .table-container {
       background: white;
-      padding: 1.5rem;
+      /* 注意：去掉了这里的 padding，防止数据滚动时从边缘漏出来 */
       border-radius: 12px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      overflow-x: auto;
+      overflow-x: auto; 
+      /* 开启纵向滚动限制，让吸顶生效 */
+      max-height: 65vh; 
+      overflow-y: auto;
     }
     table {
       width: 100%; 
       border-collapse: collapse;
+      min-width: 650px; 
     }
     th, td {
-      padding: 15px; 
+      /* 将原本容器的 padding 转移到单元格内，保持视觉一样宽敞 */
+      padding: 15px 1.5rem; 
       text-align: left; 
       border-bottom: 1px solid #e2e8f0;
     }
+    
+    /* ==== 核心优化 4：表头吸顶 ==== */
     th {
+      position: sticky; /* 吸顶关键属性 */
+      top: 0; /* 紧贴容器顶部 */
+      z-index: 10; /* 确保表头在数据行之上 */
+      background: #f1f5f9; /* 必须有实色背景，否则下面的字会透上来 */
       color: #1e40af; 
       cursor: pointer; 
       user-select: none; 
       white-space: nowrap; 
-      background: #f1f5f9;
+      /* 加上一点阴影，让滑动时的“悬浮层叠感”更真实 */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
     th:hover { background-color: #dbeafe; }
+    /* ============================ */
     
-    /* 标签颜色 */
     .badge {
       padding: 4px 10px;
       border-radius: 9999px;
@@ -101,6 +118,88 @@
       font-style: italic;
       border-left: 4px solid #cbd5e1;
     }
+
+    /* 悬浮功能按钮样式 - 蓝色主题匹配 */
+    .floating-buttons {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 1000;
+    }
+
+    .float-btn {
+      width: 48px;
+      height: 48px;
+      background-color: #3b82f6; 
+      color: white;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      opacity: 0.85;
+      position: relative;
+    }
+
+    .float-btn:hover {
+      background-color: #1e40af; 
+      transform: translateY(-3px);
+      opacity: 1;
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    }
+
+    .float-btn::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      right: 60px;
+      background-color: rgba(0,0,0,0.7);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .float-btn:hover::after {
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem; 
+      }
+      .milestone-box {
+        padding: 1rem;
+      }
+      th, td {
+        padding: 12px 1rem; /* 手机端稍微缩小一点单元格留白 */
+        font-size: 0.95rem; 
+      }
+      
+      .floating-buttons {
+        bottom: 20px;
+        right: 20px;
+      }
+      .float-btn {
+        width: 42px;
+        height: 42px;
+      }
+      .float-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+      .float-btn::after {
+        display: none; 
+      }
+    }
   </style>
 </head>
 <body>
@@ -110,24 +209,25 @@
     <p>创作出版时间线全记录</p>
   </header>
   
-  <p style="text-align: center;"><strong>创作时间顺序</strong></p>
+  <p style="text-align: center; color: #1e40af;"><strong>创作时间顺序</strong></p>
   <div class="milestone-box">
     <p><strong>阿西莫夫的银河帝国系列共15部，分为3个子系列：</strong></p>
     <p><strong>1. 基地系列（共七部，包含正传三部、前传后传各两部）</strong></p>
     <p><strong>2. 机器人系列（共五部）</strong></p>
     <p><strong>3. 银河帝国系列（共三部）</strong></p>
-    <p style="margin: 5px 0 0;">关于这些小说的“杂志连载史”（创作时间），整理如下：</p>
-	  <li><strong>1940 - 1950：</strong> 短篇集《我，机器人》中的 9 篇故事大多在 1940 年至 1950 年间首发于各大科幻杂志。</li>
-	  <li><strong>1942 - 1950：</strong> 基地三部曲最初以中短篇小说的形式于 1942 年 5 月至 1950 年 1 月期间在《惊奇科幻小说》（Astounding Science Fiction）杂志上连载发表。</li>
+    <p style="margin: 15px 0 5px 0;">关于这些小说的“杂志连载史”（创作时间），整理如下：</p>
+    <ul style="margin: 0; padding-left: 20px;">
+      <li><strong>1940 - 1950：</strong> 短篇集《我，机器人》中的 9 篇故事大多在 1940 年至 1950 年间首发于各大科幻杂志。</li>
+      <li><strong>1942 - 1950：</strong> 基地三部曲最初以中短篇小说的形式于 1942 年 5 月至 1950 年 1 月期间在《惊奇科幻小说》（Astounding Science Fiction）杂志上连载发表。</li>
       <li><strong>1951：</strong> 《繁星若尘》出版成书之前，它曾以《暴君》（Tyrann）为名，于 1951 年 1 月、2 月和 3 月在《银河科幻小说》（Galaxy Science Fiction）杂志上连载。</li>
       <li><strong>1952：</strong> 《星空暗流》于 1952 年 10 月、11 月和 12 月在《惊奇科幻小说》（Astounding Science Fiction）上完成了分三期的连载。</li>
-	  <li><strong>1953：</strong> 《钢穴》在 1954 年出版实体书之前，于 1953 年 10 月至 12 月在《银河科幻小说》（Galaxy Science Fiction）杂志上进行了连载。</li>
+      <li><strong>1953：</strong> 《钢穴》在 1954 年出版实体书之前，于 1953 年 10 月至 12 月在《银河科幻小说》（Galaxy Science Fiction）杂志上进行了连载。</li>
       <li><strong>1956：</strong> 《裸阳》于 1956 年 10 月至 12 月在《惊奇科幻小说》（Astounding Science Fiction）上连载，随后于 1957 年集结成书。</li>
-      <li><strong>20世纪80年代：</strong> 阿西莫夫创作基地后传与前传时，已是享誉全球的畅销书作家，这些作品大多直接以实体书形式出版，不再依赖早期的杂志连载模式。	</li>
-    
+      <li><strong>20世纪80年代：</strong> 阿西莫夫创作基地后传与前传时，已是享誉全球的畅销书作家，这些作品大多直接以实体书形式出版，不再依赖早期的杂志连载模式。</li>
+    </ul>
   </div>
 
-  <p style="text-align: center;"><strong>出版时间顺序</strong></p>
+  <p style="text-align: center; color: #1e40af; margin-top: 2rem;"><strong>出版时间顺序</strong></p>
   <div class="controls">
     <label for="seriesFilter">筛选系列：</label>
     <select id="seriesFilter" onchange="filterData()">
@@ -150,6 +250,19 @@
       </thead>
       <tbody id="tableBody"></tbody>
     </table>
+  </div>
+
+  <div class="floating-buttons">
+    <button class="float-btn" onclick="history.back()" data-tooltip="返回上一页">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <button class="float-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" data-tooltip="返回顶部">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 19V5M5 12l7-7 7 7"/>
+      </svg>
+    </button>
   </div>
 
   <script>
@@ -181,12 +294,10 @@
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
 
-      // 1. 过滤数据
       let displayData = currentFilter === 'All' 
         ? [...asimovBooks] 
         : asimovBooks.filter(b => b.series === currentFilter);
 
-      // 2. 排序书籍
       displayData.sort((a, b) => {
         let valA = a[currentSortKey];
         let valB = b[currentSortKey];
@@ -194,14 +305,12 @@
         return isAscending ? String(valA).localeCompare(String(valB), 'zh') : String(valB).localeCompare(String(valA), 'zh');
       });
 
-      // 3. 如果是“全部”且按“年份”排序，插入逝世事件
       if (currentFilter === 'All' && currentSortKey === 'year') {
         const insertIndex = displayData.findIndex(b => isAscending ? b.year > 1992 : b.year < 1992);
         if (insertIndex !== -1) displayData.splice(insertIndex, 0, deathEvent);
         else displayData.push(deathEvent);
       }
 
-      // 4. 生成 HTML
       displayData.forEach(item => {
         if (item.isEvent) {
           tbody.innerHTML += `<tr class="death-row"><td colspan="4">🕊️ ${item.text}</td></tr>`;
@@ -230,7 +339,6 @@
       renderTable();
     }
 
-    // 首次加载
     renderTable();
   </script>
 </body>
