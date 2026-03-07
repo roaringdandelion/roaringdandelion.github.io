@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RD's Game Life - 全成就总记录</title>
   <style>
+    /* 1. 全局盒子模型重置，防止内边距撑破手机屏幕 */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: system-ui, -apple-system, sans-serif;
       max-width: 800px;
@@ -22,9 +27,11 @@
       padding: 1rem;
       background: #f0fdf4; 
       border-radius: 8px;
+      /* 2. 核心优化：允许表格在屏幕过窄时横向滑动 */
+      overflow-x: auto;
     }
     
-    /* 新增：筛选器容器样式，放在右上角 */
+    /* 筛选器容器样式，放在右上角 */
     .filter-container {
       text-align: right;
       margin-bottom: 10px;
@@ -52,6 +59,8 @@
       border-collapse: separate;
       border-spacing: 15px;
       width: 100%; 
+      /* 保证表格被压缩时的最小宽度，防止文字挤成一团 */
+      min-width: 600px;
     }
     th, td {
       padding: 15px; 
@@ -63,7 +72,7 @@
       cursor: pointer; 
       user-select: none; 
       transition: background-color 0.2s;
-      white-space: nowrap; 
+      white-space: nowrap; /* 确保表头文字和箭头不折行 */
     }
     th:hover {
       background-color: #dcfce7;
@@ -105,6 +114,96 @@
     .hltb-link {
       border-bottom: 1px dashed #86efac; 
     }
+
+    /* ========================================= */
+    /* 悬浮功能按钮样式 - 绿色主题匹配 */
+    /* ========================================= */
+    .floating-buttons {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 1000;
+    }
+
+    .float-btn {
+      width: 48px;
+      height: 48px;
+      background-color: #16a34a; /* 匹配页面的草绿色 */
+      color: white;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      opacity: 0.85;
+      position: relative;
+    }
+
+    .float-btn:hover {
+      background-color: #15803d; /* 悬停时深绿色 */
+      transform: translateY(-3px);
+      opacity: 1;
+      box-shadow: 0 6px 16px rgba(22, 163, 74, 0.4);
+    }
+
+    /* 电脑端鼠标悬浮时的文字提示 */
+    .float-btn::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      right: 60px;
+      background-color: rgba(0,0,0,0.7);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .float-btn:hover::after {
+      opacity: 1;
+    }
+
+    /* 3. 响应式设计：针对手机和平板屏幕的优化 */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem; 
+      }
+      .game-list {
+        padding: 0.5rem; 
+      }
+      table {
+        border-spacing: 8px; 
+      }
+      th, td {
+        padding: 8px; 
+        font-size: 0.95rem; 
+      }
+      
+      /* 手机端调整悬浮按钮的大小和位置 */
+      .floating-buttons {
+        bottom: 20px;
+        right: 20px;
+      }
+      .float-btn {
+        width: 42px;
+        height: 42px;
+      }
+      .float-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+      .float-btn::after {
+        display: none; 
+      }
+    }
   </style>
 </head>
 <body>
@@ -140,12 +239,24 @@
     </table>
   </div>
 
+  <div class="floating-buttons">
+    <button class="float-btn" onclick="history.back()" data-tooltip="返回上一页">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <button class="float-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" data-tooltip="返回顶部">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 19V5M5 12l7-7 7 7"/>
+      </svg>
+    </button>
+  </div>
+
   <script src="data.js"></script>
 
   <script>
     const tbody = document.getElementById('tableBody');
     
-    // 新增：引入 currentData 变量，用于保存当前筛选后的数据状态
     let currentData = []; 
     let currentSortKey = '';
     let isAscending = false;
@@ -154,7 +265,6 @@
       tbody.innerHTML = ''; 
       let currentYear = '';
 
-      // 如果筛选后没有数据，显示提示信息
       if (data.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" style="padding: 30px; color: #64748b;">该平台暂无全成就记录</td></tr>`;
         return;
@@ -204,26 +314,21 @@
       `;
     }
 
-    // 新增：筛选功能逻辑
     function filterTable() {
       const platform = document.getElementById('platformFilter').value;
       
-      // 切换平台时，重置排序状态，回归最原始的时间轴顺序
       currentSortKey = '';
       isAscending = false;
 
       if (platform === 'All') {
         currentData = [...gamesData];
       } else {
-        // 过滤出符合所选平台的游戏
         currentData = gamesData.filter(game => game.platform === platform);
       }
       
-      // 重新渲染表格，并恢复年份分组显示
       renderTable(currentData, true);
     }
 
-    // 修改：排序功能现在对 currentData (当前筛选后的数据) 进行排序，而不是全局数据
     function sortTable(key) {
       if (currentSortKey === key) {
         isAscending = !isAscending;
@@ -256,7 +361,6 @@
       renderTable(currentData, false); 
     }
 
-    // 页面首次加载时，初始化 currentData 并渲染
     window.onload = function() {
       currentData = [...gamesData];
       renderTable(currentData, true);
