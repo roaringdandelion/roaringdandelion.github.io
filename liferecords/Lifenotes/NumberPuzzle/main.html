@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>数字拼图游戏 - 挑战你的大脑</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --hover-color: #357abd;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            /* 定义响应式基准字体大小 */
+            font-size: 16px;
+        }
+
+        /* 针对大屏幕调整基准字体 */
+        @media (min-width: 1200px) {
+            :root { font-size: 18px; }
+        }
+
+        /* 针对小屏幕微调 */
+        @media (max-width: 480px) {
+            :root { font-size: 14px; }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            /* 使用 min-height 确保在小屏幕上也能滚动 */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            max-width: 500px;
+            width: 100%;
+            /* 添加出现动画 */
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.2rem;
+            margin-bottom: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        .description {
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 2rem;
+            text-align: justify;
+            font-size: 1rem;
+        }
+
+        .menu-title {
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            color: #888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 装饰线 */
+        .menu-title::before, .menu-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #eee;
+            margin: 0 15px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .game-link {
+            text-decoration: none;
+            color: white;
+            background-color: var(--primary-color);
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: block;
+            border: 2px solid transparent;
+        }
+
+        /* 鼠标悬停与点击反馈 */
+        .game-link:hover {
+            background-color: var(--hover-color);
+            transform: scale(1.02);
+        }
+
+        .game-link:active {
+            transform: scale(0.98);
+        }
+
+        /* 针对不同难度的颜色微调（可选） */
+        .link-3 { background-color: #67c23a; }
+        .link-4 { background-color: #e6a23c; }
+        .link-5 { background-color: #f56c6c; }
+
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #bbb;
+        }
+
+        /* 针对高度过小的屏幕进行压缩优化 */
+        @media (max-height: 600px) {
+            .container { padding: 1.5rem; }
+            h1 { margin-bottom: 0.5rem; }
+            .description { margin-bottom: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🧩 数字拼图</h1>
+    
+    <div class="description">
+        一款经典的益智游戏。通过点击或滑动，移动空白格相邻的方块，直到所有数字按升序排列。
+    </div>
+
+    <div class="menu-title">难度选择</div>
+
+    <div class="button-group">
+        <a href="puzzle_3x3.html" target="_blank" class="game-link link-3">入门挑战 (3 × 3)</a>
+        <a href="puzzle_4x4.html" target="_blank" class="game-link link-4">经典模式 (4 × 4)</a>
+        <a href="puzzle_5x5.html" target="_blank" class="game-link link-5">专家难度 (5 × 5)</a>
+    </div>
+
+    <div class="footer">
+        准备好了吗？点击上方按钮开始挑战！
+    </div>
+</div>
+
+</body>
+</html>
