@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RD's Game Life</title>
   <style>
+    /* 1. 全局盒子模型重置，防止内边距撑破手机屏幕 */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: system-ui, -apple-system, sans-serif;
       max-width: 800px;
@@ -22,19 +27,119 @@
       padding: 1rem;
       background: #f0f9ff;
       border-radius: 8px;
-	  text-align: center; /* 让容器内所有内容居中 */
+      text-align: center; 
+      /* 2. 核心优化：允许表格横向滑动 */
+      overflow-x: auto; 
     }
-	table {
-		margin: 0 auto; 
-		border-collapse: separate;
-		border-spacing: 15px; /* 水平和垂直都是15px间距 */
-	}
+    table {
+      margin: 0 auto; 
+      border-collapse: separate;
+      border-spacing: 15px; 
+      width: 100%;
+      /* 保证表格在压缩时有个最小宽度 */
+      min-width: 550px; 
+    }
 
-	th, td {
-		padding: 15px; /* 增加内边距 */
-		text-align: center; /* 单元格内文字居中 */
-		/* border: 1px solid #ddd; */  /* 可选：添加边框 */
-	}
+    th, td {
+      padding: 15px; 
+      text-align: center; 
+    }
+
+    /* 3. 核心修复：解决你图片中表头文字和箭头被迫换行的问题 */
+    th {
+      white-space: nowrap; 
+    }
+
+    /* ========================================= */
+    /* 悬浮功能按钮样式 (右下角) */
+    /* ========================================= */
+    .floating-buttons {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 1000;
+    }
+
+    .float-btn {
+      width: 48px;
+      height: 48px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      opacity: 0.85;
+      position: relative;
+    }
+
+    .float-btn:hover {
+      background-color: #1e40af;
+      transform: translateY(-3px);
+      opacity: 1;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+    }
+
+    /* 电脑端鼠标悬浮时的文字提示 (Tooltip) */
+    .float-btn::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      right: 60px;
+      background-color: rgba(0,0,0,0.7);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .float-btn:hover::after {
+      opacity: 1;
+    }
+
+    /* 4. 响应式设计：针对手机和平板屏幕的优化 */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem; 
+      }
+      .game-list {
+        padding: 0.5rem; 
+      }
+      table {
+        border-spacing: 8px; 
+      }
+      th, td {
+        padding: 8px; 
+        font-size: 0.95rem; 
+      }
+      
+      /* 手机端稍微调整悬浮按钮的大小和位置 */
+      .floating-buttons {
+        bottom: 20px;
+        right: 20px;
+      }
+      .float-btn {
+        width: 42px;
+        height: 42px;
+      }
+      .float-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+      /* 手机端隐藏悬浮文字提示，以免阻挡视线 */
+      .float-btn::after {
+        display: none; 
+      }
+    }
   </style>
 </head>
 <body>
@@ -43,61 +148,66 @@
     <p>RoaringDandelion</p>
   </header>
   <div class="game-list">
-	
-	<table>
+    
+    <table>
         <tr>
-			<th>编号</th>
+            <th>编号</th>
             <th>游戏名</th>
             <th>平台</th>
             <th>全成就时长</th>
-			<th>完成日期</th>
+            <th>完成日期</th>
         </tr>
-		<tr>
-			<td>1</td>
+        <tr>
+            <td>1</td>
             <td>逆转检察官1&2 御剑精选集 </td>
             <td>XBOX</td>
             <td>43 Hours</td>
-			<td>2026/01/14</td>
+            <td>2026/01/14</td>
         </tr>
-		<tr>
-			<td>2</td>
+        <tr>
+            <td>2</td>
             <td>吸血鬼幸存者 </td>
             <td>XBOX</td>
             <td>114 Hours</td>
-			<td>2026/02/08</td>
+            <td>2026/02/08</td>
         </tr>
-		<tr>
-			<td>3</td>
+        <tr>
+            <td>3</td>
             <td>剑星 </td>
             <td>Steam</td>
             <td>64.5 Hours</td>
-			<td>2026/02/11</td>
+            <td>2026/02/11</td>
         </tr>
-		<tr>
-			<td>4</td>
+        <tr>
+            <td>4</td>
             <td>隐形守护者（补） </td>
             <td>Steam</td>
             <td>32 Hours</td>
-			<td>2026/02/11</td>
+            <td>2026/02/11</td>
         </tr>
-		<tr>
-			<td>5</td>
+        <tr>
+            <td>5</td>
             <td>人中之龙8外传 Pirates in Hawaii </td>
             <td>XBOX</td>
             <td>50 Hours</td>
-			<td>2026/02/28</td>
+            <td>2026/02/28</td>
         </tr>
         <tr>
-			<td colspan="5">...To Be Continued...</td>
+            <td colspan="5" style="color: #64748b; font-style: italic;">...To Be Continued...</td>
         </tr>
         
     </table>
   </div>
 
+  <div class="floating-buttons">
+   
+
+    <button class="float-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" data-tooltip="返回顶部">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 19V5M5 12l7-7 7 7"/>
+      </svg>
+    </button>
+  </div>
+
 </body>
 </html>
-
-
-
-
-

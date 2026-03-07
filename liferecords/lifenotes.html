@@ -87,12 +87,100 @@
       color: #6b7280;
       font-size: 0.9rem;
     }
+	/* ========================================= */
+    /* 悬浮功能按钮样式 (右下角) */
+    /* ========================================= */
+    .floating-buttons {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 1000;
+    }
+
+    .float-btn {
+      width: 48px;
+      height: 48px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      opacity: 0.85;
+      position: relative;
+    }
+
+    .float-btn:hover {
+      background-color: #1e40af;
+      transform: translateY(-3px);
+      opacity: 1;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+    }
+
+    /* 电脑端鼠标悬浮时的文字提示 (Tooltip) */
+    .float-btn::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      right: 60px;
+      background-color: rgba(0,0,0,0.7);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .float-btn:hover::after {
+      opacity: 1;
+    }
+
+    /* 4. 响应式设计：针对手机和平板屏幕的优化 */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem; 
+      }
+      .game-list {
+        padding: 0.5rem; 
+      }
+      table {
+        border-spacing: 8px; 
+      }
+      th, td {
+        padding: 8px; 
+        font-size: 0.95rem; 
+      }
+      
+      /* 手机端稍微调整悬浮按钮的大小和位置 */
+      .floating-buttons {
+        bottom: 20px;
+        right: 20px;
+      }
+      .float-btn {
+        width: 42px;
+        height: 42px;
+      }
+      .float-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+      /* 手机端隐藏悬浮文字提示，以免阻挡视线 */
+      .float-btn::after {
+        display: none; 
+      }
   </style>
 </head>
 <body>
 
   <header>
-    <a href="../index.html" class="back-link">← 返回首页</a>
     <h1>📝 RD's 生活记录</h1>
     <p>记录日常点滴，分享此时此刻。</p>
   </header>
@@ -120,7 +208,15 @@
       更多精彩内容正在码字中...
     </div>
   </div>
+  <div class="floating-buttons">
+    
 
+    <button class="float-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" data-tooltip="返回顶部">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 19V5M5 12l7-7 7 7"/>
+      </svg>
+    </button>
+    </div>
   <footer>
     <p>© 2026 RoaringDandelion</p>
   </footer>
