@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> 5 x 5 数字拼图</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --board-bg: #bbada0;
+            --tile-default: #eee4da;
+            --tile-correct: #d4edda;
+            --text-dark: #776e65;
+            --primary-btn: #8f7a66;
+            --custom-btn: #27ae60;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh; margin: 0; background-color: var(--bg-color);
+        }
+
+        .main-container { text-align: center; }
+
+        .stats-container {
+            display: flex; gap: 30px; margin-bottom: 15px;
+            font-size: 1.2rem; font-weight: bold; color: #555; justify-content: center;
+        }
+
+        /* 5x5 网格布局 */
+        .puzzle-board {
+            display: grid; grid-template-columns: repeat(5, 65px);
+            grid-template-rows: repeat(5, 65px); gap: 6px;
+            background-color: var(--board-bg); padding: 10px;
+            border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .tile {
+            width: 65px; height: 65px; background-color: var(--tile-default);
+            color: var(--text-dark); display: flex; align-items: center;
+            justify-content: center; font-size: 20px; font-weight: bold;
+            border-radius: 4px; cursor: pointer; user-select: none; transition: all 0.1s;
+        }
+
+        .tile.correct { background-color: var(--tile-correct); color: #155724; }
+        .tile.empty { background-color: #cdc1b4; cursor: default; }
+
+        .controls { margin-top: 25px; }
+        .btn-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+        button {
+            padding: 10px 18px; font-size: 14px; color: white;
+            background-color: var(--primary-btn); border: none;
+            border-radius: 5px; cursor: pointer; font-weight: bold;
+        }
+        button:hover { opacity: 0.9; }
+        button.custom-btn { background-color: var(--custom-btn); }
+
+        /* 弹窗样式 */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100;
+        }
+        .modal { background: white; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.2); }
+        
+        /* 自定义网格样式 */
+        .custom-grid { 
+            display: grid; grid-template-columns: repeat(5, 45px); 
+            gap: 5px; margin: 15px 0; 
+        }
+        .custom-grid input { 
+            width: 45px; height: 45px; text-align: center; 
+            font-size: 16px; font-weight: bold; border: 1px solid #ddd; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <h1>5×5 数字拼图</h1>
+        
+        <div class="stats-container">
+            <div>步数: <span id="move-count">0</span></div>
+            <div>时间: <span id="timer">0</span>s</div>
+        </div>
+
+        <div class="puzzle-board" id="board"></div>
+
+        <div class="controls">
+            <div class="btn-group">
+                <button id="undo-btn" onclick="undoMove()">撤销</button>
+                <button onclick="initGame()">重新洗牌</button>
+                <button class="custom-btn" onclick="showCustomModal()">自定义</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="win-modal">
+        <div class="modal">
+            <h2>🎉 恭喜通关！</h2>
+            <p id="result-text"></p>
+            <button onclick="closeModal('win-modal')">再来一局</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="custom-modal">
+        <div class="modal">
+            <h3>设置 5×5 谜题</h3>
+            <p style="font-size: 12px; color: #666;">输入 0-24 的数字（0为空格）</p>
+            <div class="custom-grid" id="custom-input-grid"></div>
+            <div id="custom-error" style="color:red; font-size:12px; margin-bottom:10px;"></div>
+            <div class="btn-group" style="justify-content: space-between; width: 100%;">
+                <button style="background: #95a5a6;" onclick="closeModal('custom-modal')">取消</button>
+                <button class="custom-btn" onclick="submitCustomPuzzle()">开始</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const size = 5;
+        let tiles = [];
+        let moves = 0, history = [], timerInterval, seconds = 0;
+        let isGameStarted = false;
+
+        const boardElement = document.getElementById('board');
+        const moveDisplay = document.getElementById('move-count');
+        const timerDisplay = document.getElementById('timer');
+        const undoBtn = document.getElementById('undo-btn');
+
+        // 初始化
+        function initGame() {
+            stopTimer();
+            moves = 0; seconds = 0; history = [];
+            isGameStarted = false;
+            updateUI();
+            tiles = [...Array(size * size).keys()].map(x => (x + 1) % (size * size));
+            shuffle();
+            render();
+        }
+
+        // 渲染棋盘
+        function render() {
+            boardElement.innerHTML = '';
+            tiles.forEach((tile, index) => {
+                const div = document.createElement('div');
+                div.className = `tile ${tile === 0 ? 'empty' : (tile === index + 1 ? 'correct' : '')}`;
+                div.innerText = tile || '';
+                div.onclick = () => moveTile(index);
+                boardElement.appendChild(div);
+            });
+        }
+
+        // 移动逻辑
+        function moveTile(index, record = true) {
+            const emptyIdx = tiles.indexOf(0);
+            if (isAdjacent(index, emptyIdx)) {
+                if (!isGameStarted) startTimer();
+                isGameStarted = true;
+                
+                if (record) history.push([...tiles]);
+                [tiles[index], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[index]];
+                moves++;
+                updateUI();
+                render();
+                checkWin();
+                return true;
+            }
+            return false;
+        }
+
+        function isAdjacent(i1, i2) {
+            const r1 = Math.floor(i1/size), c1 = i1%size, r2 = Math.floor(i2/size), c2 = i2%size;
+            return Math.abs(r1-r2) + Math.abs(c1-c2) === 1;
+        }
+
+        // 计时器
+        function startTimer() {
+            if (!timerInterval) {
+                timerInterval = setInterval(() => {
+                    seconds++;
+                    timerDisplay.innerText = seconds;
+                }, 1000);
+            }
+        }
+        function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
+
+        // 自定义谜题
+        function showCustomModal() {
+            const grid = document.getElementById('custom-input-grid');
+            grid.innerHTML = '';
+            for(let i=0; i < size*size; i++){
+                const inp = document.createElement('input');
+                inp.id = `ci-${i}`; inp.maxLength = 2;
+                grid.appendChild(inp);
+            }
+            document.getElementById('custom-modal').style.display = 'flex';
+        }
+
+        function submitCustomPuzzle() {
+            let nt = [];
+            for(let i=0; i < size*size; i++) {
+                nt.push(parseInt(document.getElementById(`ci-${i}`).value) || 0);
+            }
+            if(new Set(nt).size !== 25) { 
+                document.getElementById('custom-error').innerText="数字重复或不全"; return; 
+            }
+            if(!isSolvable(nt)) { 
+                document.getElementById('custom-error').innerText="该布局数学上无解，请修改"; return; 
+            }
+            tiles = nt; closeModal('custom-modal'); moves = 0; seconds = 0; history = []; isGameStarted = false; 
+            updateUI(); render();
+        }
+
+        // 5x5 有解验证：逆序对数量必须为偶数 (因为5是奇数，空格移动不改变逆序对奇偶性)
+        function isSolvable(arr) {
+            let inv = 0;
+            for(let i=0; i<25; i++){
+                for(let j=i+1; j<25; j++){
+                    if(arr[i] && arr[j] && arr[i] > arr[j]) inv++;
+                }
+            }
+            return inv % 2 === 0;
+        }
+
+        // 洗牌：通过模拟随机滑动确保 100% 有解
+        function shuffle() {
+            for(let i=0; i<300; i++){
+                const e = tiles.indexOf(0), r = Math.floor(e/size), c = e%size, adj = [];
+                if(r>0) adj.push(e-size); if(r<size-1) adj.push(e+size);
+                if(c>0) adj.push(e-1); if(c<size-1) adj.push(e+1);
+                const m = adj[Math.floor(Math.random()*adj.length)];
+                [tiles[e], tiles[m]] = [tiles[m], tiles[e]];
+            }
+        }
+
+        function undoMove() { if(history.length>0){ tiles=history.pop(); moves--; updateUI(); render(); } }
+        
+        function updateUI() {
+            moveDisplay.innerText = moves;
+            timerDisplay.innerText = seconds;
+            undoBtn.disabled = history.length === 0;
+        }
+
+        function checkWin() {
+            const win = tiles.every((v,i) => v === (i === size*size-1 ? 0 : i+1));
+            if(win && isGameStarted) {
+                stopTimer();
+                document.getElementById('result-text').innerText = `总步数：${moves} | 耗时：${seconds}秒`;
+                document.getElementById('win-modal').style.display='flex';
+            }
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display='none'; }
+
+        initGame();
+    </script>
+</body>
+</html>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4 x 4 数字拼图</title>
+    <style>
+        /* 保持原有样式不变 */
+        :root {
+            --bg-color: #f4f7f6;
+            --board-bg: #bbada0;
+            --tile-default: #eee4da;
+            --tile-correct: #d4edda;
+            --text-dark: #776e65;
+            --primary-btn: #8f7a66;
+            --ai-btn: #4a90e2;
+            --custom-btn: #27ae60;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            display: flex; align-items: center; justify-content: center;
+            height: 100vh; margin: 0; background-color: var(--bg-color);
+        }
+
+        .main-container { display: flex; gap: 20px; align-items: flex-start; }
+        .game-side { text-align: center; }
+
+        .stats-container {
+            display: flex; gap: 30px; margin-bottom: 10px;
+            font-size: 1.1rem; font-weight: bold; color: #555; justify-content: center;
+        }
+
+        .puzzle-board {
+            display: grid; grid-template-columns: repeat(4, 70px);
+            grid-template-rows: repeat(4, 70px); gap: 8px;
+            background-color: var(--board-bg); padding: 10px;
+            border-radius: 8px; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .tile {
+            width: 70px; height: 70px; background-color: var(--tile-default);
+            color: var(--text-dark); display: flex; align-items: center;
+            justify-content: center; font-size: 22px; font-weight: bold;
+            border-radius: 4px; cursor: pointer; transition: all 0.1s;
+        }
+
+        .tile.correct { background-color: var(--tile-correct); color: #155724; }
+        .tile.empty { background-color: #cdc1b4; }
+
+        .controls { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .btn-group { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; max-width: 320px; }
+
+        button {
+            padding: 10px 14px; font-size: 14px; color: white;
+            background-color: var(--primary-btn); border: none;
+            border-radius: 5px; cursor: pointer; font-weight: bold;
+        }
+        button.ai-btn { background-color: var(--ai-btn); }
+        button.custom-btn { background-color: var(--custom-btn); }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .log-side {
+            width: 280px; height: 420px; background: white;
+            border: 1px solid #ddd; border-radius: 8px;
+            display: none; flex-direction: column; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .log-header { padding: 10px; background: #f8f9fa; border-bottom: 1px solid #ddd; font-weight: bold; }
+        #solve-log { flex: 1; padding: 10px; overflow-y: auto; font-size: 12px; line-height: 1.6; color: #555; }
+        .log-entry { border-bottom: 1px solid #f1f1f1; padding: 4px 0; }
+        .log-entry b { color: var(--ai-btn); }
+        .pos-info { color: #e67e22; font-family: monospace; }
+        
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100;
+        }
+        .modal { background: white; padding: 25px; border-radius: 12px; text-align: center; }
+        .custom-grid { display: grid; grid-template-columns: repeat(4, 50px); gap: 8px; margin: 15px 0; }
+        .custom-grid input { width: 50px; height: 50px; text-align: center; font-size: 20px; font-weight: bold; border: 1px solid #ddd; }
+
+        .loading-overlay {
+            display: none; position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(255,255,255,0.7); align-items: center; justify-content: center;
+            z-index: 10; font-weight: bold; color: var(--ai-btn); border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="game-side">
+            <h1>4×4 数字拼图</h1>
+            <div class="stats-container">
+                <div>步数: <span id="move-count">0</span></div>
+                <div>时间: <span id="timer">0</span>s</div>
+            </div>
+
+            <div class="puzzle-board" id="board">
+                <div class="loading-overlay" id="loading">AI 思考中...</div>
+            </div>
+
+            <div class="controls">
+                <div class="btn-group">
+                    <button id="undo-btn" onclick="undoMove()">撤销</button>
+                    <button onclick="initGame()">洗牌</button>
+                    <button class="custom-btn" onclick="showCustomModal()">自定义</button>
+                    <button class="ai-btn" id="ai-btn" onclick="solveUltimate()">AI 稳健解答</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="log-side" id="log-side">
+            <div class="log-header">AI 运行日志</div>
+            <div id="solve-log"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="win-modal">
+        <div class="modal">
+            <h2>🎉 挑战成功！</h2>
+            <p id="result-text"></p>
+            <button onclick="closeModal('win-modal')">确认</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="custom-modal">
+        <div class="modal" style="width: 280px;">
+            <h3>设置自定义谜题</h3>
+            <div class="custom-grid" id="custom-input-grid"></div>
+            <div id="custom-error" style="color:red; font-size:12px; margin-bottom:10px;"></div>
+            <div class="btn-group" style="justify-content: space-between; width: 100%;">
+                <button style="background: #95a5a6;" onclick="closeModal('custom-modal')">取消</button>
+                <button class="custom-btn" onclick="submitCustomPuzzle()">开始</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const size = 4;
+        let tiles = [];
+        let moves = 0, history = [], timerInterval, seconds = 0;
+        let isGameStarted = false, isSolving = false;
+        let aiStepCounter = 0;
+
+        const boardElement = document.getElementById('board');
+        const logSide = document.getElementById('log-side');
+        const logElement = document.getElementById('solve-log');
+        const moveDisplay = document.getElementById('move-count');
+        const timerDisplay = document.getElementById('timer');
+        const aiButton = document.getElementById('ai-btn');
+        const undoBtn = document.getElementById('undo-btn');
+
+        function initGame() {
+            stopTimer();
+            moves = 0; seconds = 0; history = []; aiStepCounter = 0;
+            isGameStarted = false; isSolving = false;
+            updateUI();
+            tiles = [...Array(16).keys()].map(x => (x + 1) % 16);
+            shuffle();
+            render();
+            logSide.style.display = 'none';
+            aiButton.innerText = "AI 稳健解答";
+            aiButton.disabled = false;
+        }
+
+        function render() {
+            boardElement.querySelectorAll('.tile').forEach(el => el.remove());
+            tiles.forEach((tile, index) => {
+                const div = document.createElement('div');
+                div.className = `tile ${tile === 0 ? 'empty' : (tile === index + 1 ? 'correct' : '')}`;
+                div.innerText = tile || '';
+                div.onclick = () => { if (!isSolving) moveTile(index); };
+                boardElement.appendChild(div);
+            });
+        }
+
+        // 辅助函数：将索引转换为坐标名称
+        function getPosName(index) {
+            const r = Math.floor(index / size) + 1;
+            const c = (index % size) + 1;
+            return `(${r},${c})`;
+        }
+
+        function moveTile(index, record = true) {
+            const emptyIdx = tiles.indexOf(0);
+            if (isAdjacent(index, emptyIdx)) {
+                if (!isGameStarted && !isSolving) startTimer();
+                isGameStarted = true;
+                
+                const fromPos = getPosName(index);
+                const toPos = getPosName(emptyIdx);
+                const movedVal = tiles[index];
+
+                if (record) history.push([...tiles]);
+                [tiles[index], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[index]];
+                moves++;
+                updateUI();
+                render();
+                checkWin();
+                
+                return { val: movedVal, from: fromPos, to: toPos };
+            }
+            return null;
+        }
+
+        function isAdjacent(i1, i2) {
+            const r1 = Math.floor(i1/4), c1 = i1%4, r2 = Math.floor(i2/4), c2 = i2%4;
+            return Math.abs(r1-r2) + Math.abs(c1-c2) === 1;
+        }
+
+        // --- AI 逻辑 ---
+        async function solveUltimate() {
+            if (isSolving) return;
+            isSolving = true;
+            aiButton.disabled = true;
+            logSide.style.display = 'flex';
+            logElement.innerHTML = "<b>[AI 运行日志]</b><br>";
+            aiStepCounter = 0;
+
+            if (!isGameStarted) startTimer();
+            isGameStarted = true;
+
+            const stages = [
+                { t: [1], l: [] }, { t: [1,2], l: [1] }, { t: [1,2,3], l: [1,2] }, { t: [1,2,3,4], l: [1,2,3] },
+                { t: [1,2,3,4,5], l: [1,2,3,4] }, { t: [1,2,3,4,5,6], l: [1,2,3,4,5] }, 
+                { t: [1,2,3,4,5,6,7], l: [1,2,3,4,5,6] }, { t: [1,2,3,4,5,6,7,8], l: [1,2,3,4,5,6,7] },
+                { t: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], l: [1,2,3,4,5,6,7,8] }
+            ];
+
+            for (let stage of stages) {
+                if (stage.t.every(val => tiles.indexOf(val) === (val-1))) continue;
+
+                const targetNum = stage.t[stage.t.length-1];
+                logElement.innerHTML += `<div style="color:#2980b9; margin-top:5px;">⏳ 定位数字 ${targetNum}... </div>`;
+                document.getElementById('loading').style.display = 'flex';
+                await new Promise(r => setTimeout(r, 50));
+
+                let path = findAStarPath(stage.t, stage.l, 12000); 
+                if (!path && stage.l.length > 0) {
+                    logElement.innerHTML += `<span style="color:orange;">尝试避让... </span>`;
+                    path = findAStarPath(stage.t, stage.l.slice(0, -1), 18000);
+                }
+
+                document.getElementById('loading').style.display = 'none';
+
+                if (path) {
+                    for (let state of path) {
+                        aiStepCounter++;
+                        const nextEmptyIdx = state.indexOf(0);
+                        const stepInfo = moveTile(nextEmptyIdx, true);
+                        
+                        // 打印详细移动信息
+                        const entry = document.createElement('div');
+                        entry.className = 'log-entry';
+                        entry.innerHTML = `步序 ${aiStepCounter}: 数字 <b>${stepInfo.val}</b> 从 <span class="pos-info">${stepInfo.from}</span> 至 <span class="pos-info">${stepInfo.to}</span>`;
+                        logElement.appendChild(entry);
+                        logElement.scrollTop = logElement.scrollHeight;
+
+                        await new Promise(r => setTimeout(r, 150));
+                    }
+                } else {
+                    logElement.innerHTML += `<br><span style="color:#e67e22; font-weight:bold;">⚠️ 请手动将数字 ${targetNum} 移近目标。</span><br>`;
+                    logElement.scrollTop = logElement.scrollHeight;
+                    isSolving = false;
+                    aiButton.disabled = false;
+                    aiButton.innerText = "继续解答";
+                    return;
+                }
+            }
+            logElement.innerHTML += "<br><b>[全部任务完成！]</b>";
+            isSolving = false;
+            aiButton.disabled = false;
+            aiButton.innerText = "AI 稳健解答";
+        }
+
+        function findAStarPath(targets, lockList, limit) {
+            let open = [{ state: [...tiles], g: 0, h: getH(tiles, targets), parent: null }];
+            let closed = new Set();
+            while (open.length > 0 && limit-- > 0) {
+                open.sort((a,b) => (a.g + a.h) - (b.g + b.h));
+                let curr = open.shift();
+                if (targets.every(t => curr.state.indexOf(t) === (t-1))) {
+                    let p = []; while(curr.parent){ p.unshift(curr.state); curr = curr.parent; } return p;
+                }
+                closed.add(curr.state.join(','));
+                const e = curr.state.indexOf(0), r = Math.floor(e/4), c = e%4;
+                [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([nr,nc]) => {
+                    if(nr>=0 && nr<4 && nc>=0 && nc<4){
+                        let ni = nr*4+nc;
+                        let penalty = lockList.includes(curr.state[ni]) ? 1500 : 1;
+                        let ns = [...curr.state]; [ns[e], ns[ni]] = [ns[ni], ns[e]];
+                        if(!closed.has(ns.join(','))) open.push({state:ns, g:curr.g+penalty, h:getH(ns,targets), parent:curr});
+                    }
+                });
+            }
+            return null;
+        }
+
+        function getH(s, targets) {
+            return s.reduce((acc, v, i) => {
+                if (v === 0 || !targets.includes(v)) return acc;
+                const t = v - 1;
+                return acc + Math.abs(Math.floor(i/4)-Math.floor(t/4)) + Math.abs(i%4-t%4);
+            }, 0);
+        }
+
+        // --- 其他辅助功能 ---
+        function startTimer() {
+            if (!timerInterval) {
+                timerInterval = setInterval(() => {
+                    seconds++;
+                    timerDisplay.innerText = seconds;
+                }, 1000);
+            }
+        }
+        function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
+
+        function showCustomModal() {
+            const grid = document.getElementById('custom-input-grid');
+            grid.innerHTML = '';
+            for(let i=0; i<16; i++){
+                const inp = document.createElement('input');
+                inp.id = `ci-${i}`; inp.maxLength = 2;
+                grid.appendChild(inp);
+            }
+            document.getElementById('custom-modal').style.display = 'flex';
+        }
+        function submitCustomPuzzle() {
+            let nt = [];
+            for(let i=0; i<16; i++) nt.push(parseInt(document.getElementById(`ci-${i}`).value) || 0);
+            if(new Set(nt).size !== 16) { document.getElementById('custom-error').innerText="数字重复或不全"; return; }
+            if(!isSolvable(nt)) { document.getElementById('custom-error').innerText="数学上无解，请修改"; return; }
+            tiles = nt; closeModal('custom-modal'); moves = 0; seconds = 0; history = []; isGameStarted = false; 
+            updateUI(); render(); logElement.innerHTML = "已应用自定义谜题。";
+        }
+        function isSolvable(arr) {
+            let inv = 0;
+            for(let i=0; i<16; i++){
+                for(let j=i+1; j<16; j++){ if(arr[i] && arr[j] && arr[i] > arr[j]) inv++; }
+            }
+            const blankRowFromBottom = 4 - Math.floor(arr.indexOf(0)/4);
+            return (blankRowFromBottom % 2 === 0) ? (inv % 2 !== 0) : (inv % 2 === 0);
+        }
+
+        function updateUI() {
+            moveDisplay.innerText = moves;
+            timerDisplay.innerText = seconds;
+            undoBtn.disabled = history.length === 0 || isSolving;
+        }
+        function shuffle() {
+            for(let i=0; i<120; i++){
+                const e = tiles.indexOf(0), r = Math.floor(e/4), c = e%4, adj = [];
+                if(r>0) adj.push(e-4); if(r<3) adj.push(e+4);
+                if(c>0) adj.push(e-1); if(c<3) adj.push(e+1);
+                const m = adj[Math.floor(Math.random()*adj.length)];
+                [tiles[e], tiles[m]] = [tiles[m], tiles[e]];
+            }
+        }
+        function undoMove() { if(history.length>0){ tiles=history.pop(); moves--; updateUI(); render(); } }
+        function checkWin() {
+            if(tiles.every((v,i) => v === (i===15?0:i+1)) && isGameStarted) {
+                stopTimer();
+                setTimeout(() => {
+                    document.getElementById('result-text').innerText = `步数：${moves} | 耗时：${seconds}秒`;
+                    document.getElementById('win-modal').style.display='flex';
+                }, 300);
+            }
+        }
+        function closeModal(id) { document.getElementById(id).style.display='none'; }
+
+        initGame();
+    </script>
+</body>
+</html>
