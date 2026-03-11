@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>4x4 拼图 - 墙</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --board-bg: #bbada0;
+            --tile-default: #eee4da;
+            --tile-correct: #d4edda;
+            --tile-fixed: #34495e;
+            --text-dark: #776e65;
+            --primary-btn: #8f7a66;
+            --custom-btn: #27ae60;
+            --tile-max-size: 80px;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh; margin: 0; background-color: var(--bg-color);
+            touch-action: manipulation;
+        }
+
+        .game-container { width: 100%; max-width: 400px; text-align: center; padding: 20px; }
+        .stats { display: flex; gap: 20px; margin-bottom: 15px; font-weight: bold; justify-content: center; color: #555; }
+
+        .puzzle-board {
+            display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);
+            gap: 8px; background-color: var(--board-bg); padding: 10px; border-radius: 8px;
+            width: 100%; aspect-ratio: 1 / 1; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .tile {
+            background-color: var(--tile-default); color: var(--text-dark); 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: clamp(1rem, 5vw, 1.8rem); font-weight: bold;
+            border-radius: 4px; cursor: pointer; user-select: none; transition: 0.1s;
+        }
+
+        .tile.correct { background-color: var(--tile-correct); color: #155724; }
+        .tile.empty { background-color: #cdc1b4; cursor: default; }
+        .tile.fixed { background-color: var(--tile-fixed); color: white; }
+        
+        /* 编辑模式下的光标提示 */
+        .editing .tile { cursor: crosshair; border: 2px dashed #95a5a6; }
+        .editing .tile.fixed { border: 2px solid #fff; }
+
+        .btn-group { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+        button { padding: 12px 18px; border: none; border-radius: 5px; cursor: pointer; background: var(--primary-btn); color: white; font-weight: bold; transition: 0.2s; }
+        .custom-btn { background: var(--custom-btn); }
+        .undo-btn { background: #95a5a6; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+
+        .mode-indicator { margin-top: 10px; font-weight: bold; color: var(--custom-btn); min-height: 20px; }
+        
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100; }
+        .modal { background: white; padding: 30px; border-radius: 15px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h2>4×4 拼图 (墙)</h2>
+    <div class="stats">
+        <div>步数: <span id="moves">0</span></div>
+        <div>时间: <span id="timer">0</span>s</div>
+    </div>
+
+    <div id="board" class="puzzle-board"></div>
+    
+    <div id="mode-text" class="mode-indicator"></div>
+
+    <div class="btn-group">
+        <button id="undo-btn" class="undo-btn" onclick="undoMove()">撤销</button>
+        <button id="edit-btn" class="custom-btn" onclick="toggleEditMode()">设置墙位置</button>
+        <button id="reset-btn" onclick="initGame()">随机洗牌</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="win-modal">
+    <div class="modal">
+        <h2>🎉 挑战成功！</h2>
+        <p id="win-text"></p>
+        <button onclick="closeWinModal()">再玩一局</button>
+    </div>
+</div>
+
+<script>
+    const size = 4;
+    let tiles = []; 
+    let goalState = []; 
+    let history = []; 
+    let moves = 0, seconds = 0, timerInterval, fixedIdx = 5, isGameActive = false;
+    let isEditing = false; // 是否处于编辑模式 [cite: 2026-03-07]
+
+    function initGame() {
+        clearInterval(timerInterval);
+        isEditing = false;
+        moves = 0; seconds = 0; isGameActive = false; history = [];
+        document.getElementById('moves').innerText = 0;
+        document.getElementById('timer').innerText = 0;
+        document.getElementById('edit-btn').innerText = "设置墙位置";
+        document.getElementById('mode-text').innerText = "";
+        document.getElementById('board').classList.remove('editing');
+        
+        // 1. 生成目标状态 (基于当前的 fixedIdx)
+        generateGoalState();
+        // 2. 模拟洗牌
+        shuffleSolvable();
+        render();
+    }
+
+    function generateGoalState() {
+        tiles = new Array(size * size).fill(null);
+        tiles[fixedIdx] = -1; // 放置墙 [cite: 2026-03-07]
+        let num = 1;
+        for (let i = 0; i < tiles.length; i++) {
+            if (tiles[i] === -1) continue;
+            if (num <= 14) tiles[i] = num++;
+            else tiles[i] = 0; // 空格
+        }
+        goalState = [...tiles];
+    }
+
+    function toggleEditMode() {
+        if (!isEditing) {
+            // 进入编辑模式 [cite: 2026-03-07]
+            isEditing = true;
+            isGameActive = false;
+            clearInterval(timerInterval);
+            document.getElementById('edit-btn').innerText = "生成谜题";
+            document.getElementById('mode-text').innerText = "请点击格子选择墙的位置...";
+            document.getElementById('board').classList.add('editing');
+            renderEditor();
+        } else {
+            // 退出编辑并生成 [cite: 2026-03-10]
+            initGame();
+        }
+    }
+
+    function renderEditor() {
+        const board = document.getElementById('board');
+        board.innerHTML = '';
+        // 编辑模式下显示数字顺序，点击改变墙的位置 [cite: 2026-03-07]
+        for (let i = 0; i < size * size; i++) {
+            const div = document.createElement('div');
+            div.className = 'tile' + (i === fixedIdx ? ' fixed' : '');
+            div.innerText = (i === fixedIdx) ? '墙' : '';
+            div.onclick = () => {
+                fixedIdx = i;
+                renderEditor();
+            };
+            board.appendChild(div);
+        }
+    }
+
+    function shuffleSolvable() {
+        let count = 0;
+        let emptyIdx = tiles.indexOf(0);
+        while (count < 600) {
+            const adj = getValidNeighbors(emptyIdx);
+            const moveIdx = adj[Math.floor(Math.random() * adj.length)];
+            [tiles[emptyIdx], tiles[moveIdx]] = [tiles[moveIdx], tiles[emptyIdx]];
+            emptyIdx = moveIdx;
+            count++;
+        }
+    }
+
+    function getValidNeighbors(idx) {
+        const r = Math.floor(idx / size), c = idx % size;
+        const neighbors = [];
+        for (let [dr, dc] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+            const nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < size && nc >= 0 && nc < size) {
+                const nIdx = nr * size + nc;
+                if (tiles[nIdx] !== -1) neighbors.push(nIdx);
+            }
+        }
+        return neighbors;
+    }
+
+    function render() {
+        if (isEditing) return;
+        const board = document.getElementById('board');
+        board.innerHTML = '';
+        tiles.forEach((tile, index) => {
+            const div = document.createElement('div');
+            div.className = 'tile';
+            if (tile === -1) {
+                div.classList.add('fixed');
+                div.innerText = '墙';
+            } else if (tile === 0) {
+                div.classList.add('empty');
+            } else {
+                div.innerText = tile;
+                if (tile === goalState[index]) div.classList.add('correct');
+                div.onclick = () => moveTile(index);
+            }
+            board.appendChild(div);
+        });
+        document.getElementById('undo-btn').disabled = (history.length === 0);
+    }
+
+    function moveTile(index) {
+        if (isEditing) return;
+        const emptyIdx = tiles.indexOf(0);
+        if (isAdjacent(index, emptyIdx) && tiles[index] !== -1) {
+            if (moves === 0) { startTimer(); isGameActive = true; }
+            history.push([...tiles]);
+            [tiles[index], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[index]];
+            moves++;
+            document.getElementById('moves').innerText = moves;
+            render();
+            checkWin();
+        }
+    }
+
+    function undoMove() {
+        if (history.length > 0) {
+            tiles = history.pop();
+            moves--;
+            document.getElementById('moves').innerText = moves;
+            render();
+        }
+    }
+
+    function isAdjacent(i1, i2) {
+        const r1 = Math.floor(i1/size), c1 = i1%size, r2 = Math.floor(i2/size), c2 = i2%size;
+        return Math.abs(r1-r2) + Math.abs(c1-c2) === 1;
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            seconds++;
+            document.getElementById('timer').innerText = seconds;
+        }, 1000);
+    }
+
+    function checkWin() {
+        const isWin = tiles.every((val, index) => val === goalState[index]);
+        if (isWin && isGameActive) {
+            clearInterval(timerInterval);
+            isGameActive = false;
+            document.getElementById('win-text').innerText = `步数：${moves}\n耗时：${seconds}秒`;
+            document.getElementById('win-modal').style.display = 'flex';
+        }
+    }
+
+    function closeWinModal() {
+        document.getElementById('win-modal').style.display = 'none';
+        initGame();
+    }
+
+    initGame();
+</script>
+</body>
+</html>
