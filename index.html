@@ -1,301 +1,281 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>4x4 拼图 - 智能固定数字版</title>
-    <style>
-        :root {
-            --bg-color: #f4f7f6;
-            --board-bg: #bbada0;
-            --tile-default: #eee4da;
-            --tile-correct: #d4edda;
-            --tile-fixed-border: #34495e; /* 固定数字块的边框颜色 */
-            --text-dark: #776e65;
-            --primary-btn: #8f7a66;
-            --custom-btn: #27ae60;
-            --tile-max-size: 80px;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RD's Page</title>
+  <style>
+    /* 新增：全局盒子模型重置，确保 padding 和 border 不会撑破容器宽度 */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Segoe UI', "Microsoft YaHei", sans-serif;
-            display: flex; align-items: center; justify-content: center;
-            min-height: 100vh; margin: 0; background-color: var(--bg-color);
-            touch-action: manipulation;
-        }
+    /* 全局样式 */
+    body {
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+      line-height: 1.7;
+      color: #333;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+      min-height: 100vh;
+    }
 
-        .game-container { width: 100%; max-width: 400px; text-align: center; padding: 20px; }
-        .stats { display: flex; gap: 20px; margin-bottom: 15px; font-weight: bold; justify-content: center; color: #555; }
+    /* 头部样式 */
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+    }
 
-        .puzzle-board {
-            display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);
-            gap: 8px; background-color: var(--board-bg); padding: 10px; border-radius: 8px;
-            width: 100%; aspect-ratio: 1 / 1; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
+    h1 {
+      color: #1e40af;
+      margin-bottom: 0.5rem;
+      font-size: 2.5rem;
+      background: linear-gradient(90deg, #1e40af, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-        .tile {
-            background-color: var(--tile-default); color: var(--text-dark); 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: clamp(1rem, 5vw, 1.8rem); font-weight: bold;
-            border-radius: 4px; cursor: pointer; user-select: none; transition: 0.1s;
-            box-sizing: border-box;
-        }
+    h2 {
+      color: #374151;
+      margin-top: 2.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+    }
 
-        .tile.correct { background-color: var(--tile-correct); color: #155724; }
-        .tile.empty { background-color: #cdc1b4; cursor: default; }
-        
-        /* 核心修改：固定砖块不再显示墙，而是显示数字，但有一个特殊的深色边框 */
-        .tile.fixed { border: 4px solid var(--tile-fixed-border); cursor: not-allowed; }
-        
-        /* 编辑模式下的光标提示 */
-        .editing .tile { cursor: crosshair; border: 2px dashed #95a5a6; }
-        .editing .tile.fixed { border: 2px solid var(--tile-fixed-border); background: var(--tile-fixed-border); color: white; }
+    p {
+      font-size: 1.1rem;
+      color: #4b5563;
+      margin-bottom: 1.2rem;
+    }
 
-        .btn-group { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
-        button { padding: 12px 18px; border: none; border-radius: 5px; cursor: pointer; background: var(--primary-btn); color: white; font-weight: bold; transition: 0.2s; }
-        .custom-btn { background: var(--custom-btn); }
-        .undo-btn { background: #95a5a6; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
+    /* 主要内容区域 */
+    .main-content {
+      background: white;
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+    }
 
-        .mode-indicator { margin-top: 10px; font-weight: bold; color: var(--custom-btn); min-height: 20px; }
-        
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100; }
-        .modal { background: white; padding: 30px; border-radius: 15px; text-align: center; }
-    </style>
+    /* 优化：使用 CSS Grid 网格布局替代 Flex，实现极佳的自适应 */
+    .button-container {
+      display: grid;
+      /* 魔法代码：按最小240px的宽度自动排列，排不下就自动换行填满 */
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin: 2.5rem 0;
+    }
+
+    /* 按钮样式 - 简约边框按钮 */
+    .outline-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 20px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #3b82f6;
+      background: white;
+      border: 2px solid #3b82f6;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      width: 100%; /* 占满 Grid 分配的单元格 */
+    }
+
+    .outline-btn:hover {
+      background: #3b82f6;
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    /* 按钮图标 */
+    .btn-icon {
+      font-size: 1.3rem;
+    }
+
+    /* 特色区域 */
+    .feature-box {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-radius: 12px;
+      padding: 1.8rem;
+      margin-top: 2rem;
+      border-left: 5px solid #3b82f6;
+    }
+
+    .feature-box h3 {
+      color: #1e40af;
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+
+    /* 页脚 */
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e5e7eb;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+    /* ========================================= */
+    /* 悬浮功能按钮样式 (右下角) */
+    /* ========================================= */
+    .floating-buttons {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 1000;
+    }
+
+    .float-btn {
+      width: 48px;
+      height: 48px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      opacity: 0.85;
+      position: relative;
+    }
+
+    .float-btn:hover {
+      background-color: #1e40af;
+      transform: translateY(-3px);
+      opacity: 1;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+    }
+
+    /* 电脑端鼠标悬浮时的文字提示 (Tooltip) */
+    .float-btn::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      right: 60px;
+      background-color: rgba(0,0,0,0.7);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .float-btn:hover::after {
+      opacity: 1;
+    }
+    /* 优化后的响应式设计（针对手机和平板） */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem; /* 减小四周留白 */
+      }
+
+      .main-content {
+        padding: 1.5rem; /* 减小内容区留白 */
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      /* 手机端按钮调整 */
+      .button-container {
+        grid-template-columns: 1fr; /* 手机端强制单列显示 */
+        gap: 1rem; /* 减小按钮上下间距 */
+      }
+
+      .outline-btn {
+        padding: 14px 16px; /* 减小按钮内部间距，防止文字拥挤 */
+        font-size: 1.05rem;
+      }
+	  /* 手机端稍微调整悬浮按钮的大小和位置 */
+      .floating-buttons {
+        bottom: 20px;
+        right: 20px;
+      }
+      .float-btn {
+        width: 42px;
+        height: 42px;
+      }
+      .float-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+      /* 手机端隐藏悬浮文字提示，以免阻挡视线 */
+      .float-btn::after {
+        display: none; 
+      }
+    }
+    }
+  </style>
 </head>
 <body>
+  <header>
+    <h1>你好，世界！</h1>
+    <h2>我是怒吼的蒲公英 (RoaringDandelion)!</h2>
+  </header>
+    <p>这是我利用 GitHub Pages 生成的第一个网站。</p>
+    <p>我要认真学习博客技术，分享我的生活！</p>
+	<p>其实都是大模型在帮我~^_^~</p>
+  <div class="main-content">
+    <h2>我的生活记录</h2>
+    <p>点击下方按钮查看我的生活记录：</p>
 
-<div class="game-container">
-    <h2>🧩 数字拼图 (固定块版)</h2>
-    <div class="stats">
-        <div>步数: <span id="moves">0</span></div>
-        <div>时间: <span id="timer">0</span>s</div>
+    <div class="button-container">
+      <a href="liferecords/gamelife.html" target="_blank" class="outline-btn">
+        <span class="btn-icon">🎮</span>
+        我的游戏生活2026
+      </a>
+
+      <a href="liferecords/movielife.html" target="_blank" class="outline-btn">
+        <span class="btn-icon">🎬</span>
+        我的电影记录2026
+      </a>
+		<a href="liferecords/booklife.html" target="_blank" class="outline-btn">
+        <span class="btn-icon">📕</span>
+        我的读书记录2026
+      </a>
+	    <a href="liferecords/lifenotes.html" target="_blank" class="outline-btn">
+        <span class="btn-icon">📝</span>
+        我的各种随记
+      </a>
+    </div>
+    </div>
+	<div class="floating-buttons">
+
+
+    <button class="float-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" data-tooltip="返回顶部">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 19V5M5 12l7-7 7 7"/>
+      </svg>
+    </button>
     </div>
 
-    <div id="board" class="puzzle-board"></div>
-    
-    <div id="mode-text" class="mode-indicator"></div>
 
-    <div class="btn-group">
-        <button id="undo-btn" class="undo-btn" onclick="undoMove()">撤销</button>
-        <button id="edit-btn" class="custom-btn" onclick="toggleEditMode()">设置固定块位置</button>
-        <button id="lock-wall-btn" onclick="toggleWallLock()" style="background: #95a5a6;">锁定固定块位置: 关</button>
-        <button id="reset-btn" onclick="initGame()">随机洗牌开始</button>
-    </div>
-    
-    <p style="margin-top:15px; font-size: 0.8rem; color:#888;">注：深色边框的数字是固定的，空格无法移动到该位置。目标状态为 1-15 升序。</p>
-</div>
-
-<div class="modal-overlay" id="win-modal">
-    <div class="modal">
-        <h2>🎉 挑战成功！</h2>
-        <p id="win-text"></p>
-        <button onclick="closeWinModal()">再玩一局</button>
-    </div>
-</div>
-
-<script>
-    const size = 4;
-    let tiles = []; 
-    let goalState = []; 
-    let history = []; 
-    let moves = 0, seconds = 0, timerInterval, isGameActive = false;
-    
-    // 初始化胜利目标为标准的 1-15 加上空格
-    goalState = [...Array(size * size).keys()].map(x => (x + 1) % (size * size));
-
-    // 初始化固定块的位置设为随机 (排除最后一个空格位置)
-    let fixedIdx = Math.floor(Math.random() * (size * size - 1)); 
-    let isEditing = false; 
-    let isWallLocked = false; 
-
-    function initGame(fromEdit = false) {
-        clearInterval(timerInterval);
-        isEditing = false;
-        moves = 0; seconds = 0; isGameActive = false; history = [];
-        document.getElementById('moves').innerText = 0;
-        document.getElementById('timer').innerText = 0;
-        document.getElementById('edit-btn').innerText = "设置固定块位置";
-        document.getElementById('mode-text').innerText = "";
-        document.getElementById('board').classList.remove('editing');
-        
-        // 如果是正常洗牌且没有锁定墙，则随机生成新墙位置（避开最后一个空格位）
-        if (!fromEdit && !isWallLocked) {
-            fixedIdx = Math.floor(Math.random() * (size * size - 1));
-        }
-
-        // 核心修改：生成标准的 数组 数组
-        tiles = [...goalState];
-
-        // 模拟洗牌，打乱过程中通过核心约束避开固定块位置
-        shuffleSolvable();
-        render();
-    }
-
-    // 从终点出发洗牌，确保 100% 可解
-    function shuffleSolvable() {
-        let count = 0;
-        let emptyIdx = tiles.indexOf(0);
-        while (count < 800) {
-            // 获取可用的邻居，这里包含了固定块的物理阻断
-            const adj = getValidNeighbors(emptyIdx);
-            const moveIdx = adj[Math.floor(Math.random() * adj.length)];
-            
-            // 交换空格和目标，完成一步合法移动
-            [tiles[emptyIdx], tiles[moveIdx]] = [tiles[moveIdx], tiles[emptyIdx]];
-            emptyIdx = moveIdx;
-            count++;
-        }
-    }
-
-    // 获取空格周围可以移动的索引 (核心逻辑：避开边界和固定块位置)
-    function getValidNeighbors(idx) {
-        const r = Math.floor(idx / size), c = idx % size;
-        const neighbors = [];
-        for (let [dr, dc] of [[-1,0],[1,0],[0,-1],[0,1]]) {
-            const nr = r + dr, nc = c + dc;
-            if (nr >= 0 && nr < size && nc >= 0 && nc < size) {
-                const nIdx = nr * size + nc;
-                // 关键：不能移动固定块位置
-                if (nIdx !== fixedIdx) {
-                    neighbors.push(nIdx);
-                }
-            }
-        }
-        return neighbors;
-    }
-
-    function render() {
-        if (isEditing) return;
-        const board = document.getElementById('board');
-        board.innerHTML = '';
-        tiles.forEach((tile, index) => {
-            const div = document.createElement('div');
-            div.className = 'tile';
-            
-            if (tile === 0) {
-                div.classList.add('empty');
-                div.innerText = '';
-            } else {
-                div.innerText = tile;
-                if (tile === goalState[index]) div.classList.add('correct');
-                
-                // 核心修改：如果是固定块所在位置，显示它本身的数字，但加上固定块样式
-                if (index === fixedIdx) {
-                    div.classList.add('fixed');
-                    // 没有 onclick
-                } else {
-                    div.onclick = () => moveTile(index);
-                }
-            }
-            board.appendChild(div);
-        });
-        document.getElementById('undo-btn').disabled = (history.length === 0);
-    }
-
-    function toggleEditMode() {
-        if (!isEditing) {
-            isEditing = true;
-            isGameActive = false;
-            clearInterval(timerInterval);
-            document.getElementById('edit-btn').innerText = "生成谜题";
-            document.getElementById('mode-text').innerText = "请点击格子选择固定块的位置...";
-            document.getElementById('board').classList.add('editing');
-            renderEditor();
-        } else {
-            initGame(true);
-        }
-    }
-
-    // 锁定位置功能保留
-    function toggleWallLock() {
-        isWallLocked = !isWallLocked;
-        const lockBtn = document.getElementById('lock-wall-btn');
-        if (isWallLocked) {
-            lockBtn.innerText = "锁定固定块位置: 开";
-            lockBtn.style.background = "#e67e22"; 
-        } else {
-            lockBtn.innerText = "锁定固定块位置: 关";
-            lockBtn.style.background = "#95a5a6"; 
-        }
-    }
-
-    function renderEditor() {
-        const board = document.getElementById('board');
-        board.innerHTML = '';
-        for (let i = 0; i < size * size; i++) {
-            const div = document.createElement('div');
-            // 编辑模式下显示终点状态的数字，让用户知道选择哪个数字固定
-            const tileVal = (i + 1) % (size * size);
-            
-            div.className = 'tile' + (i === fixedIdx ? ' fixed' : '');
-            if(tileVal === 0) {
-                div.classList.add('empty');
-                div.innerText = '';
-            } else {
-                div.innerText = tileVal;
-            }
-            
-            div.onclick = () => {
-                fixedIdx = i;
-                renderEditor();
-            };
-            board.appendChild(div);
-        }
-    }
-
-    function moveTile(index) {
-        if (isEditing) return;
-        const emptyIdx = tiles.indexOf(0);
-        // 除了相邻，还必须不能点击那个固定的位置
-        if (isAdjacent(index, emptyIdx) && index !== fixedIdx) {
-            if (moves === 0) { startTimer(); isGameActive = true; }
-            history.push([...tiles]);
-            [tiles[index], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[index]];
-            moves++;
-            document.getElementById('moves').innerText = moves;
-            render();
-            checkWin();
-        }
-    }
-
-    function undoMove() {
-        if (history.length > 0) {
-            tiles = history.pop();
-            moves--;
-            document.getElementById('moves').innerText = moves;
-            render();
-        }
-    }
-
-    function isAdjacent(i1, i2) {
-        const r1 = Math.floor(i1/size), c1 = i1%size, r2 = Math.floor(i2/size), c2 = i2%size;
-        return Math.abs(r1-r2) + Math.abs(c1-c2) === 1;
-    }
-
-    function startTimer() {
-        timerInterval = setInterval(() => {
-            seconds++;
-            document.getElementById('timer').innerText = seconds;
-        }, 1000);
-    }
-
-    function checkWin() {
-        const isWin = tiles.every((val, index) => val === goalState[index]);
-        if (isWin && isGameActive) {
-            clearInterval(timerInterval);
-            isGameActive = false;
-            document.getElementById('win-text').innerText = `步数：${moves}\n耗时：${seconds}秒`;
-            document.getElementById('win-modal').style.display = 'flex';
-        }
-    }
-
-    function closeWinModal() {
-        document.getElementById('win-modal').style.display = 'none';
-        initGame();
-    }
-
-    initGame();
-</script>
+  <footer>
+    <p>© 2026 RoaringDandelion | 由 GitHub Pages 托管</p>
+  </footer>
 </body>
+
 </html>
