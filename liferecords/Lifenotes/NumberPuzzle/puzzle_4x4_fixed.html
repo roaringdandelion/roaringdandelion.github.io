@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>4x4 拼图 - 墙</title>
+    <title>4x4 拼图Plus - 固定数字版</title>
     <style>
         :root {
             --bg-color: #f4f7f6;
             --board-bg: #bbada0;
             --tile-default: #eee4da;
             --tile-correct: #d4edda;
-            --tile-fixed: #34495e;
+            --tile-fixed-border: #34495e; /* 固定数字块的边框颜色 */
             --text-dark: #776e65;
             --primary-btn: #8f7a66;
             --custom-btn: #27ae60;
@@ -18,7 +18,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', "Microsoft YaHei", sans-serif;
             display: flex; align-items: center; justify-content: center;
             min-height: 100vh; margin: 0; background-color: var(--bg-color);
             touch-action: manipulation;
@@ -38,15 +38,18 @@
             display: flex; align-items: center; justify-content: center; 
             font-size: clamp(1rem, 5vw, 1.8rem); font-weight: bold;
             border-radius: 4px; cursor: pointer; user-select: none; transition: 0.1s;
+            box-sizing: border-box;
         }
 
         .tile.correct { background-color: var(--tile-correct); color: #155724; }
         .tile.empty { background-color: #cdc1b4; cursor: default; }
-        .tile.fixed { background-color: var(--tile-fixed); color: white; }
+        
+        /* 核心修改：固定砖块不再显示墙，而是显示数字，但有一个特殊的深色边框 */
+        .tile.fixed { border: 4px solid var(--tile-fixed-border); cursor: not-allowed; }
         
         /* 编辑模式下的光标提示 */
         .editing .tile { cursor: crosshair; border: 2px dashed #95a5a6; }
-        .editing .tile.fixed { border: 2px solid #fff; }
+        .editing .tile.fixed { border: 2px solid var(--tile-fixed-border); background: var(--tile-fixed-border); color: white; }
 
         .btn-group { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
         button { padding: 12px 18px; border: none; border-radius: 5px; cursor: pointer; background: var(--primary-btn); color: white; font-weight: bold; transition: 0.2s; }
@@ -63,7 +66,7 @@
 <body>
 
 <div class="game-container">
-    <h2>4×4 拼图 (墙)</h2>
+    <h2>🧩 数字拼图 (固定块版)</h2>
     <div class="stats">
         <div>步数: <span id="moves">0</span></div>
         <div>时间: <span id="timer">0</span>s</div>
@@ -75,9 +78,12 @@
 
     <div class="btn-group">
         <button id="undo-btn" class="undo-btn" onclick="undoMove()">撤销</button>
-        <button id="edit-btn" class="custom-btn" onclick="toggleEditMode()">设置墙位置</button>
-        <button id="reset-btn" onclick="initGame()">随机洗牌</button>
+        <button id="edit-btn" class="custom-btn" onclick="toggleEditMode()">设置固定块位置</button>
+        <button id="lock-wall-btn" onclick="toggleWallLock()" style="background: #95a5a6;">锁定固定块位置: 关</button>
+        <button id="reset-btn" onclick="initGame()">随机洗牌开始</button>
     </div>
+    
+    <p style="margin-top:15px; font-size: 0.8rem; color:#888;">注：深色边框的数字是固定的，空格无法移动到该位置。目标状态为 1-15 升序。</p>
 </div>
 
 <div class="modal-overlay" id="win-modal">
@@ -93,82 +99,56 @@
     let tiles = []; 
     let goalState = []; 
     let history = []; 
-    let moves = 0, seconds = 0, timerInterval, fixedIdx = 5, isGameActive = false;
-    let isEditing = false; // 是否处于编辑模式 [cite: 2026-03-07]
+    let moves = 0, seconds = 0, timerInterval, isGameActive = false;
+    
+    // 初始化胜利目标为标准的 1-15 加上空格
+    goalState = [...Array(size * size).keys()].map(x => (x + 1) % (size * size));
 
-    function initGame() {
+    // 初始化固定块的位置设为随机 (排除最后一个空格位置)
+    let fixedIdx = Math.floor(Math.random() * (size * size - 1)); 
+    let isEditing = false; 
+    let isWallLocked = false; 
+
+    function initGame(fromEdit = false) {
         clearInterval(timerInterval);
         isEditing = false;
         moves = 0; seconds = 0; isGameActive = false; history = [];
         document.getElementById('moves').innerText = 0;
         document.getElementById('timer').innerText = 0;
-        document.getElementById('edit-btn').innerText = "设置墙位置";
+        document.getElementById('edit-btn').innerText = "设置固定块位置";
         document.getElementById('mode-text').innerText = "";
         document.getElementById('board').classList.remove('editing');
         
-        // 1. 生成目标状态 (基于当前的 fixedIdx)
-        generateGoalState();
-        // 2. 模拟洗牌
+        // 如果是正常洗牌且没有锁定墙，则随机生成新墙位置（避开最后一个空格位）
+        if (!fromEdit && !isWallLocked) {
+            fixedIdx = Math.floor(Math.random() * (size * size - 1));
+        }
+
+        // 核心修改：生成标准的 数组 数组
+        tiles = [...goalState];
+
+        // 模拟洗牌，打乱过程中通过核心约束避开固定块位置
         shuffleSolvable();
         render();
     }
 
-    function generateGoalState() {
-        tiles = new Array(size * size).fill(null);
-        tiles[fixedIdx] = -1; // 放置墙 [cite: 2026-03-07]
-        let num = 1;
-        for (let i = 0; i < tiles.length; i++) {
-            if (tiles[i] === -1) continue;
-            if (num <= 14) tiles[i] = num++;
-            else tiles[i] = 0; // 空格
-        }
-        goalState = [...tiles];
-    }
-
-    function toggleEditMode() {
-        if (!isEditing) {
-            // 进入编辑模式 [cite: 2026-03-07]
-            isEditing = true;
-            isGameActive = false;
-            clearInterval(timerInterval);
-            document.getElementById('edit-btn').innerText = "生成谜题";
-            document.getElementById('mode-text').innerText = "请点击格子选择墙的位置...";
-            document.getElementById('board').classList.add('editing');
-            renderEditor();
-        } else {
-            // 退出编辑并生成 [cite: 2026-03-10]
-            initGame();
-        }
-    }
-
-    function renderEditor() {
-        const board = document.getElementById('board');
-        board.innerHTML = '';
-        // 编辑模式下显示数字顺序，点击改变墙的位置 [cite: 2026-03-07]
-        for (let i = 0; i < size * size; i++) {
-            const div = document.createElement('div');
-            div.className = 'tile' + (i === fixedIdx ? ' fixed' : '');
-            div.innerText = (i === fixedIdx) ? '墙' : '';
-            div.onclick = () => {
-                fixedIdx = i;
-                renderEditor();
-            };
-            board.appendChild(div);
-        }
-    }
-
+    // 从终点出发洗牌，确保 100% 可解
     function shuffleSolvable() {
         let count = 0;
         let emptyIdx = tiles.indexOf(0);
-        while (count < 600) {
+        while (count < 800) {
+            // 获取可用的邻居，这里包含了固定块的物理阻断
             const adj = getValidNeighbors(emptyIdx);
             const moveIdx = adj[Math.floor(Math.random() * adj.length)];
+            
+            // 交换空格和目标，完成一步合法移动
             [tiles[emptyIdx], tiles[moveIdx]] = [tiles[moveIdx], tiles[emptyIdx]];
             emptyIdx = moveIdx;
             count++;
         }
     }
 
+    // 获取空格周围可以移动的索引 (核心逻辑：避开边界和固定块位置)
     function getValidNeighbors(idx) {
         const r = Math.floor(idx / size), c = idx % size;
         const neighbors = [];
@@ -176,7 +156,10 @@
             const nr = r + dr, nc = c + dc;
             if (nr >= 0 && nr < size && nc >= 0 && nc < size) {
                 const nIdx = nr * size + nc;
-                if (tiles[nIdx] !== -1) neighbors.push(nIdx);
+                // 关键：不能移动固定块位置
+                if (nIdx !== fixedIdx) {
+                    neighbors.push(nIdx);
+                }
             }
         }
         return neighbors;
@@ -189,25 +172,83 @@
         tiles.forEach((tile, index) => {
             const div = document.createElement('div');
             div.className = 'tile';
-            if (tile === -1) {
-                div.classList.add('fixed');
-                div.innerText = '墙';
-            } else if (tile === 0) {
+            
+            if (tile === 0) {
                 div.classList.add('empty');
+                div.innerText = '';
             } else {
                 div.innerText = tile;
                 if (tile === goalState[index]) div.classList.add('correct');
-                div.onclick = () => moveTile(index);
+                
+                // 核心修改：如果是固定块所在位置，显示它本身的数字，但加上固定块样式
+                if (index === fixedIdx) {
+                    div.classList.add('fixed');
+                    // 没有 onclick
+                } else {
+                    div.onclick = () => moveTile(index);
+                }
             }
             board.appendChild(div);
         });
         document.getElementById('undo-btn').disabled = (history.length === 0);
     }
 
+    function toggleEditMode() {
+        if (!isEditing) {
+            isEditing = true;
+            isGameActive = false;
+            clearInterval(timerInterval);
+            document.getElementById('edit-btn').innerText = "生成谜题";
+            document.getElementById('mode-text').innerText = "请点击格子选择固定块的位置...";
+            document.getElementById('board').classList.add('editing');
+            renderEditor();
+        } else {
+            initGame(true);
+        }
+    }
+
+    // 锁定位置功能保留
+    function toggleWallLock() {
+        isWallLocked = !isWallLocked;
+        const lockBtn = document.getElementById('lock-wall-btn');
+        if (isWallLocked) {
+            lockBtn.innerText = "锁定固定块位置: 开";
+            lockBtn.style.background = "#e67e22"; 
+        } else {
+            lockBtn.innerText = "锁定固定块位置: 关";
+            lockBtn.style.background = "#95a5a6"; 
+        }
+    }
+
+    function renderEditor() {
+        const board = document.getElementById('board');
+        board.innerHTML = '';
+        for (let i = 0; i < size * size; i++) {
+            const div = document.createElement('div');
+            // 编辑模式下显示终点状态的数字，让用户知道选择哪个数字固定
+            const tileVal = (i + 1) % (size * size);
+            
+            div.className = 'tile' + (i === fixedIdx ? ' fixed' : '');
+            if(tileVal === 0) {
+                div.classList.add('empty');
+                div.innerText = '';
+            } else {
+                div.innerText = tileVal;
+            }
+            
+            div.onclick = () => {
+                fixedIdx = i;
+                renderEditor();
+            };
+            board.appendChild(div);
+        }
+    }
+
     function moveTile(index) {
         if (isEditing) return;
         const emptyIdx = tiles.indexOf(0);
-        if (isAdjacent(index, emptyIdx) && tiles[index] !== -1) {
+        // 除了相邻，还必须不能点击那个固定的位置
+        if (isAdjacent(index, emptyIdx) && index !== fixedIdx) {
             if (moves === 0) { startTimer(); isGameActive = true; }
             history.push([...tiles]);
             [tiles[index], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[index]];
