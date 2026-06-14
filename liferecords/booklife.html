@@ -1,1 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的读书记录</title>
+    <style>
+        /* 现代网页基础重置 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
+        body {
+            font-family: "PingFang SC", "Lantinghei SC", "Microsoft YaHei", -apple-system, sans-serif;
+            background-color: #f4f6f9; 
+            color: #333333;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .page-container {
+            width: 100%;
+            max-width: 760px;
+            background-color: #ffffff;
+            border-radius: 16px; 
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); 
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+            position: relative;
+        }
+        
+        .page-title::after {
+            content: "";
+            display: block;
+            width: 40px;
+            height: 3px;
+            background-color: #94a3b8;
+            margin: 10px auto 0 auto;
+            border-radius: 2px;
+        }
+
+        .record-card {
+            display: flex;
+            background-color: #eef2f7; 
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            gap: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s, box-shadow 0.2s;
+			margin-bottom: 24px;
+        }
+
+        .record-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .book-cover-wrapper {
+            width: 120px;
+            height: 168px; 
+            flex-shrink: 0;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12); 
+            background-color: #e2e8f0; 
+        }
+
+        .book-cover-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            display: block;
+        }
+
+        .book-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            gap: 16px;
+        }
+
+        /* ✨ 核心改动：使用 CSS 变量接收卡片传来的颜色 */
+        .text-accent {
+            color: var(--theme-color, #991b1b); 
+        }
+
+        .book-title {
+            font-size: 20px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .book-date {
+            font-size: 14px;
+            white-space: nowrap; 
+            padding-top: 4px;
+            opacity: 0.8;
+        }
+
+        .book-author {
+            font-size: 15px;
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+
+        .book-review {
+            font-size: 15px;
+            line-height: 1.6; 
+            text-align: justify; 
+            /* ✨ 核心改动：让虚线变成通用的灰色 */
+            border-top: 1px dashed rgba(0, 0, 0, 0.15); 
+            padding-top: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .page-container { padding: 20px; }
+            .record-card {
+                flex-direction: column; 
+                align-items: center;
+                text-align: center;
+                padding: 20px;
+            }
+            .book-details { width: 100%; }
+            .details-header {
+                flex-direction: column; 
+                align-items: center;
+                gap: 6px;
+                margin-bottom: 8px;
+            }
+            .book-cover-wrapper {
+                width: 130px; 
+                height: 182px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-container">
+        
+        <h1 class="page-title">读书记录</h1>
+
+        <div class="record-card" style="--theme-color: #991b1b;">
+            
+            <div class="book-cover-wrapper">
+                <img class="book-cover-img" src="绿野仙踪.jpg" alt="书籍封面">
+            </div>
+
+            <div class="book-details">
+                <div class="details-header">
+                    <h2 class="text-accent book-title">《绿野仙踪》</h2>
+                    <span class="text-accent book-date">2026年2月21日</span>
+                </div>
+                <div class="text-accent book-author">[美] 莱曼·弗兰克·鲍姆</div>
+                <div class="text-accent book-review">
+                    所以Dorothy为什么这么火呢？
+                </div>
+            </div>
+
+        </div> 
+
+        <div class="record-card" style="--theme-color: #4b0082;">
+            
+            <div class="book-cover-wrapper">
+                <img class="book-cover-img" src="不夜城.jpg" alt="书籍封面">
+            </div>
+
+            <div class="book-details">
+                <div class="details-header">
+                    <h2 class="text-accent book-title">《不夜城》</h2>
+                    <span class="text-accent book-date">2026年6月9日</span>
+                </div>
+                <div class="text-accent book-author">[日] 驰星周</div>
+                <div class="text-accent book-review">
+                    看的是台译本电子书。和简中实体书相比，实体为了出版，做的修改挺多的。也是没办法。
+                </div>
+            </div>
+
+        </div> 
+    
+    </div>
+</body>
+</html>
