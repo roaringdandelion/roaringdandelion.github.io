@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0d1721" />
+    <title>Minesweeper Mini</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <a class="site-back" href="../../play/">← 返回小游戏</a>
+      <header class="topbar">
+        <div class="brand-block">
+          <span class="eyebrow">MINI ARCADE / 01</span>
+          <h1>Minesweeper</h1>
+          <p>Clear the field. Trust your instincts.</p>
+        </div>
+        <button class="icon-button" id="reset-button" type="button" aria-label="Start a new game" title="New game">↻</button>
+      </header>
+
+      <section class="game-panel" aria-label="Minesweeper game">
+        <div class="status-row">
+          <div class="metric"><span class="metric-label">Mines</span><strong id="mine-count">010</strong></div>
+          <div class="face" id="face" aria-live="polite">●</div>
+          <div class="metric metric-right"><span class="metric-label">Time</span><strong id="timer">000</strong></div>
+        </div>
+
+        <div class="controls">
+          <label for="difficulty">Board</label>
+          <select id="difficulty">
+            <option value="easy">Easy · 9 × 9</option>
+            <option value="medium">Medium · 12 × 12</option>
+            <option value="hard">Hard · 16 × 16</option>
+          </select>
+          <span class="hint">Left click reveal · right click flag</span>
+        </div>
+
+        <div class="powerups" aria-label="Power-ups">
+          <div class="power-card" id="health-button">
+            <span class="power-icon">♥</span>
+            <span class="power-copy"><strong>Extra life</strong><small id="health-status">Ready once</small></span>
+            <label class="switch" title="Enable extra life">
+              <input id="health-toggle" type="checkbox" checked />
+              <span class="switch-track"></span>
+              <span class="sr-only">Enable extra life</span>
+            </label>
+          </div>
+          <div class="power-card">
+            <span class="power-icon">⌗</span>
+            <span class="power-copy"><strong>Scanner</strong><small id="scanner-status">1 scan available</small></span>
+            <button class="power-button" id="scanner-button" type="button" title="Scan a 3 by 3 area">Use</button>
+            <label class="switch" title="Enable scanner">
+              <input id="scanner-toggle" type="checkbox" checked />
+              <span class="switch-track"></span>
+              <span class="sr-only">Enable scanner</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="board-wrap">
+          <div id="board" class="board" role="grid" aria-label="Minesweeper board"></div>
+        </div>
+
+        <div class="message" id="message" aria-live="polite">Pick a tile to begin.</div>
+      </section>
+
+      <footer class="footer-note"><span class="dot"></span> A tiny game of probability and nerve</footer>
+    </main>
+    <dialog class="result-dialog" id="result-dialog" aria-labelledby="result-title">
+      <div class="dialog-kicker">ROUND COMPLETE</div>
+      <h2 id="result-title">Field cleared</h2>
+      <p id="result-summary">You found every mine.</p>
+      <div class="result-stats">
+        <span><small>Time</small><strong id="result-time">000s</strong></span>
+        <span><small>Board</small><strong id="result-board">Easy</strong></span>
+      </div>
+      <button class="dialog-button" id="dialog-restart" type="button">Play again</button>
+    </dialog>
+    <script src="./script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+[
+  {
+    "title": "首页",
+    "url": "/",
+    "key": "home"
+  },
+  {
+    "title": "生活记录",
+    "url": "/records/",
+    "key": "records"
+  },
+  {
+    "title": "小游戏",
+    "url": "/play/",
+    "key": "play"
+  },
+  {
+    "title": "小工具",
+    "url": "/tools/",
+    "key": "tools"
+  },
+  {
+    "title": "杂谈",
+    "url": "/notes/",
+    "key": "notes"
+  }
+]

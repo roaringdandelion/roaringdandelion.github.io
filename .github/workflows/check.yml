@@ -1,0 +1,27 @@
+name: Check website
+on:
+  pull_request:
+  push:
+    branches: [main, site-maintenance]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/check-source.cjs
+      - run: node scripts/test-shixu.cjs
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - run: bundle exec jekyll build --trace
+      - run: node scripts/check-links.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: website-preview
+          path: _site

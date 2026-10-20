@@ -1,3 +1,27 @@
-theme: jekyll-theme-minimal
-title: RD's homepage
-description: Bookmark this to keep an eye on my project updates!
+title: 怒吼的蒲公英
+description: 游戏、阅读、电影，以及生活中的好奇心。
+url: https://roaringdandelion.github.io
+baseurl: ""
+lang: zh-CN
+timezone: Asia/Shanghai
+markdown: kramdown
+permalink: /notes/:year/:month/:day/:title/
+collections:
+  projects:
+    output: false
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - AGENTS.md
+  - docs
+  - templates
+  - scripts
+  - vendor
+  - node_modules
