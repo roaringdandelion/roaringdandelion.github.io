@@ -34,3 +34,7 @@
 运行 node scripts/check-source.cjs。安装 Ruby/Bundler 后运行 bundle install、bundle exec jekyll build、node scripts/check-links.cjs。GitHub PR 自动执行相同构建和链接检查。
 
 让 Codex 在分支提交改动、创建 PR。确认预览和检查后再合并，沿用仓库原有 GitHub Pages 发布。不要用浏览器直接打开源 HTML 判断 Jekyll 页面是否正常，应先构建。
+
+## BookLife 与 MovieLife 保留约定
+
+按所有者要求，这两页保留改版前的原始 HTML、配色与排版，暂不调整。生活记录卡片及首页最近记录直接指向 /liferecords/booklife.html 和 /liferecords/movielife.html；/records/books/、/records/movies/ 只作兼容跳转。不要给原页面添加公共 CSS、导航或改写内容。_data/books.json、movies.json 目前用于首页摘要，后续若明确要求新增记录，应与原页面同步更新。
