@@ -12,5 +12,7 @@ r=api.parse('2026-10-20 24:00，无效。2026-10-20 10:60，无效。2023年2月
 r=api.parse('公元前221年，统一。1939年9月1日，事件。2026年10月，月份。');assert.equal(r.events.length,3);assert.equal(r.events[0].year,-221);
 assert.equal(api.parse('没有日期').events.length,0);
 get('source').value='2026年10月20日9点30分，开会。2026-10-20 09:05，签到。';get('generate').click();const json=api.exportJSON();assert.equal(json.version,4);assert.equal(json.events[0].minute,5);assert.equal(json.events[1].hour,9);
-assert.equal(get('preview').children[2].children[0].textContent,'2026年10月20日 09:05');api.exportPNG();assert(drawn.includes('2026年10月20日 09:05'));assert(drawn.includes('2026年10月20日 09:30'));
+assert.equal(get('preview').children[2].children[0].textContent,'2026年10月20日 09:05');api.exportPNG();assert(drawn.join('').includes('2026年10月20日 09:05'));assert(drawn.includes('2026年10月20日 09:30'));
 console.log('Passed: minute/hour sorting, midnight, missing precision, invalid clocks/dates, BCE, preview, JSON and PNG timestamps.');
+for(const style of ['1','2','3','4']){get('layout').value=style;get('layout').onchange();assert.equal(get('preview').className,'layout-'+style);assert.equal(api.exportJSON().layout,Number(style));drawn.length=0;api.exportPNG();assert(drawn.join('').includes('2026年10月20日 09:05'));assert(drawn.includes('签到'));}
+console.log('Passed: four preview styles, matching export selection, PNG content retained.');
