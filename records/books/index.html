@@ -1,0 +1,6 @@
+---
+layout: "default"
+title: "读书记录"
+section: "records"
+---
+<header class="page-heading"><a class="back" href="{{ '/records/' | relative_url }}">← 生活记录</a><h1>读书记录</h1><p>读过的故事，以及读完那一刻的想法。</p></header><div data-records><div class="filter-bar"><label>年份 <select data-year-filter><option value="all">全部年份</option></select></label><label>搜索 <input type="search" data-search placeholder="输入名称关键词"></label><span data-count aria-live="polite"></span></div><div class="record-stack">{% assign entries = site.data.books | sort: 'date' | reverse %}{% for item in entries %}<article class="record-card book" data-record data-year="{{ item.date | slice: 0,4 }}"><img src="{{ item.cover | relative_url }}" alt="{{ item.title | escape }}封面" loading="lazy" width="100" height="140"><div><time>{{ item.date }}</time><h2>{{ item.title | escape }}</h2><p>{{ item.author | escape }}</p><div class="review">{{ item.review | escape | newline_to_br }}</div></div></article>{% endfor %}</div><p data-no-results hidden>没有符合条件的记录。</p></div>

@@ -1,0 +1,6 @@
+---
+layout: "default"
+title: "游戏记录"
+section: "records"
+---
+<header class="page-heading"><a class="back" href="{{ '/records/' | relative_url }}">← 生活记录</a><h1>全成就游戏记录</h1><p>从 2022 年开始，记下每一次完成。</p></header><div data-records><div class="filter-bar"><label>年份 <select data-year-filter><option value="all">全部年份</option></select></label><label>搜索 <input type="search" data-search placeholder="输入名称关键词"></label><span data-count aria-live="polite"></span></div><div class="table-scroll"><table><thead><tr><th>游戏</th><th>平台</th><th>时长（小时）</th><th>完成日期</th></tr></thead><tbody>{% assign entries = site.data.games | sort: 'date' | reverse %}{% for item in entries %}<tr data-record data-year="{{ item.date | slice: 0,4 }}"><td>{% if item.url %}<a href="{{ item.url | escape }}">{{ item.name | escape }}</a>{% else %}{{ item.name | escape }}{% endif %}</td><td>{{ item.platform | escape }}</td><td>{{ item.duration }}</td><td>{{ item.date }}</td></tr>{% endfor %}</tbody></table></div><p data-no-results hidden>没有符合条件的记录。</p></div>
