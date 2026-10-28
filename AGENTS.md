@@ -12,3 +12,5 @@
 - 保留旧 URL 的跳转；移动内容时检查图片和脚本路径。
 - 先运行 node scripts/check-source.cjs，再构建 Jekyll，运行 node scripts/check-links.cjs。没有 Ruby 时明确报告构建未执行，让 PR CI 验证。
 - 改动提交到独立分支并创建 PR；除非所有者明确要求上线，不合并。
+
+- 2026-10-28 所有者确认 MovieLife 卡片改版：标题仅 MovieLife，不提供评分、短评或观后感；顶部筛选默认折叠，底部统计常显并汇总分钟数。MovieLife 数据统一来自 _data/movies.json（含 minutes、poster、durationSource、可选 edition），只维护一份数据。BookLife 继续保持原设计不动。
