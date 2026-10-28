@@ -38,3 +38,7 @@
 ## BookLife 与 MovieLife 保留约定
 
 按所有者要求，这两页保留改版前的原始 HTML、配色与排版，暂不调整。生活记录卡片及首页最近记录直接指向 /liferecords/booklife.html 和 /liferecords/movielife.html；/records/books/、/records/movies/ 只作兼容跳转。不要给原页面添加公共 CSS、导航或改写内容。_data/books.json、movies.json 目前用于首页摘要，后续若明确要求新增记录，应与原页面同步更新。
+
+## MovieLife 最新维护方式（2026-10-28）
+
+MovieLife 按所有者确认样例改为电影卡片，原页面保持 URL。数据只更新 _data/movies.json，首页与 MovieLife 自动同步。每条填写 minutes（整数分钟）、poster、durationSource；版本不同时填写 edition。指环王三部曲暂采用院线版 178/179/201 分钟；棋王参考 Apple TV 流媒体 111 分钟，不同发行版可能不同。顶部筛选初始折叠，底部统计始终可见，按记录的片长累计；海报使用外部图片地址，加载失败显示片名占位。不要增加评价、短评或观后感。

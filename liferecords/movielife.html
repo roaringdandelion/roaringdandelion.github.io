@@ -1,210 +1,153 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RD's Movie Life</title>
-  <style>
-    /* 1. 全局盒子模型重置，防止内边距撑破手机屏幕 */
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
+---
+permalink: /liferecords/movielife.html
+---
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>MovieLife</title><style>
+        /* 现代网页基础重置 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 2rem;
-      line-height: 1.6;
-    }
-    .header {
-      text-align: center;
-      color: #2563eb;
-      margin-bottom: 2rem;
-    }
-    .game-list {
-      margin: 2rem 0;
-      padding: 1rem;
-      background: #f0f9ff;
-      border-radius: 8px;
-      text-align: center; 
-      /* 2. 核心优化：允许表格横向滑动 */
-      overflow-x: auto; 
-    }
-    table {
-      margin: 0 auto; 
-      border-collapse: separate;
-      border-spacing: 15px; 
-      width: 100%;
-      /* 保证表格在压缩时有个最小宽度 */
-      min-width: 550px; 
-    }
+        body {
+            font-family: "PingFang SC", "Lantinghei SC", "Microsoft YaHei", -apple-system, sans-serif;
+            background-color: #f4f6f9; 
+            color: #333333;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
 
-    th, td {
-      padding: 15px; 
-      text-align: center; 
-    }
+        .page-container {
+            width: 100%;
+            max-width: 760px;
+            background-color: #ffffff;
+            border-radius: 16px; 
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); 
+        }
 
-    /* 3. 核心修复：解决你图片中表头文字和箭头被迫换行的问题 */
-    th {
-      white-space: nowrap; 
-    }
+        .page-title {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+            position: relative;
+        }
+        
+        .page-title::after {
+            content: "";
+            display: block;
+            width: 40px;
+            height: 3px;
+            background-color: #94a3b8;
+            margin: 10px auto 0 auto;
+            border-radius: 2px;
+        }
 
-    /* ========================================= */
-    /* 悬浮功能按钮样式 (右下角) */
-    /* ========================================= */
-    .floating-buttons {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      z-index: 1000;
-    }
+        .record-card {
+            display: flex;
+            background-color: #eef2f7; 
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            gap: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s, box-shadow 0.2s;
+			margin-bottom: 24px;
+        }
 
-    .float-btn {
-      width: 48px;
-      height: 48px;
-      background-color: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      opacity: 0.85;
-      position: relative;
-    }
+        .record-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+        }
 
-    .float-btn:hover {
-      background-color: #1e40af;
-      transform: translateY(-3px);
-      opacity: 1;
-      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
-    }
+        .book-cover-wrapper {
+            width: 120px;
+            height: 168px; 
+            flex-shrink: 0;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12); 
+            background-color: #e2e8f0; 
+        }
 
-    /* 电脑端鼠标悬浮时的文字提示 (Tooltip) */
-    .float-btn::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      right: 60px;
-      background-color: rgba(0,0,0,0.7);
-      color: white;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      white-space: nowrap;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-    .float-btn:hover::after {
-      opacity: 1;
-    }
+        .book-cover-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            display: block;
+        }
 
-    /* 4. 响应式设计：针对手机和平板屏幕的优化 */
-    @media (max-width: 768px) {
-      body {
-        padding: 1rem; 
-      }
-      .game-list {
-        padding: 0.5rem; 
-      }
-      table {
-        border-spacing: 8px; 
-      }
-      th, td {
-        padding: 8px; 
-        font-size: 0.95rem; 
-      }
-      
-      /* 手机端稍微调整悬浮按钮的大小和位置 */
-      .floating-buttons {
-        bottom: 20px;
-        right: 20px;
-      }
-      .float-btn {
-        width: 42px;
-        height: 42px;
-      }
-      .float-btn svg {
-        width: 20px;
-        height: 20px;
-      }
-      /* 手机端隐藏悬浮文字提示，以免阻挡视线 */
-      .float-btn::after {
-        display: none; 
-      }
-    }
-  </style>
-</head>
-<body>
-  <header class="header">
-    <h1>2026 观影记录</h1>
-    <p>RoaringDandelion</p>
-  </header>
-  <div class="movie-list">
+        .book-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            gap: 16px;
+        }
+
+        /* ✨ 核心改动：使用 CSS 变量接收卡片传来的颜色 */
+        .text-accent {
+            color: var(--theme-color, #991b1b); 
+        }
+
+        .book-title {
+            font-size: 20px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .book-date {
+            font-size: 14px;
+            white-space: nowrap; 
+            padding-top: 4px;
+            opacity: 0.8;
+        }
+
+        .book-author {
+            font-size: 15px;
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+
+        .book-review {
+            font-size: 15px;
+            line-height: 1.6; 
+            text-align: justify; 
+            /* ✨ 核心改动：让虚线变成通用的灰色 */
+            border-top: 1px dashed rgba(0, 0, 0, 0.15); 
+            padding-top: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .page-container { padding: 20px; }
+            .record-card {
+                flex-direction: column; 
+                align-items: center;
+                text-align: center;
+                padding: 20px;
+            }
+            .book-details { width: 100%; }
+            .details-header {
+                flex-direction: column; 
+                align-items: center;
+                gap: 6px;
+                margin-bottom: 8px;
+            }
+            .book-cover-wrapper {
+                width: 130px; 
+                height: 182px;
+            }
+        }
     
-    <table>
-        <tr>
-            <th>电影名</th>
-            <th>外文名</th>
-            <th>导演</th>
-            <th>观看日期</th>
-        </tr>
-        <tr>
-            <td><a href="https://movie.douban.com/subject/3819939/" target="_blank" class="movie-link">极恶非道1</a></td>
-            <td>Outrage</td>
-            <td>[日]北野武</td>
-            <td>2026/01/26</td>
-        </tr>
-        <tr>
-            <td><a href="https://movie.douban.com/subject/5286821/" target="_blank" class="movie-link">极恶非道2</a></td>
-            <td>Outrage Beyond</td>
-            <td>[日]北野武</td>
-            <td>2026/01/27</td>
-        </tr>
-        <tr>
-            <td><a href="https://movie.douban.com/subject/26862893/" target="_blank" class="movie-link">极恶非道3</a></td>
-            <td>Outrage Coda</td>
-            <td>[日]北野武</td>
-            <td>2026/01/29</td>
-        </tr>
-      <tr>
-            <td><a href="https://movie.douban.com/subject/1917171/" target="_blank" class="movie-link">硫磺岛家书</a></td>
-            <td>Letters from Iwo Jima</td>
-            <td>[美]克林特·伊斯特伍德</td>
-            <td>2026/06/12</td>
-        </tr>
-      <tr>
-            <td><a href="https://movie.douban.com/subject/1478066/" target="_blank" class="movie-link">父辈的旗帜</a></td>
-            <td>Flags of Our Fathers</td>
-            <td>[美]克林特·伊斯特伍德</td>
-            <td>2026/06/20</td>
-        </tr>
-      <tr>
-            <td><a href="https://movie.douban.com/subject/1307163/" target="_blank" class="movie-link">棋王</a></td>
-            <td>King of Chess</td>
-            <td>严浩</td>
-            <td>2026/07/16</td>
-        </tr>
-        <tr>
-            <td colspan='4' style="color: #64748b; font-style: italic;">...To BE Continued...</td>
-        </tr>
-    </table>
-  </div>
-  <div class="floating-buttons">
-    
-
-    <button class="float-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" data-tooltip="返回顶部">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 19V5M5 12l7-7 7 7"/>
-      </svg>
-    </button>
-    </div>
-</body>
-</html>
+.back-link{display:inline-block;color:#64748b;font-size:14px;margin-bottom:24px;text-underline-offset:4px}.page-title{margin-bottom:30px}.book-cover-wrapper{height:180px}.book-cover-img{object-fit:contain;background:#e2e8f0}.book-details{justify-content:center;min-width:0}.book-title a{color:inherit;text-decoration:none}.book-title a:hover{text-decoration:underline}.movie-original{font-size:14px;line-height:1.6;margin:0 0 16px;color:#64748b}.movie-director{font-size:15px}.book-date{font-size:13px}.record-card:last-of-type{margin-bottom:0}.poster-fallback{display:none;width:100%;height:100%;align-items:center;justify-content:center;text-align:center;color:#64748b;font-size:13px;padding:12px}a:focus-visible{outline:2px solid #64748b;outline-offset:4px}@media(max-width:600px){.book-cover-wrapper{height:195px}.book-details{align-items:center}.movie-original{margin-top:6px}.record-card{gap:18px}}
+.movie-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:22px}.stat{padding:16px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;text-align:center}.stat strong{display:block;font-size:26px;line-height:1.3;color:#334155;font-weight:600}.stat span{display:block;margin-top:6px;font-size:12px;color:#64748b}.movie-filters{display:grid;grid-template-columns:1fr 1.4fr;gap:14px;margin-bottom:16px}.movie-filters label{display:flex;flex-direction:column;gap:7px;font-size:13px;color:#64748b}.movie-filters input,.movie-filters select{width:100%;min-width:0;padding:10px 12px;border:1px solid #cbd5e1;border-radius:7px;background:white;color:#334155;font:inherit;min-height:42px}.search-field{grid-column:1/-1}.filter-status{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 22px;color:#64748b;font-size:13px}.reset-filters{background:none;border:0;color:#475569;text-decoration:underline;text-underline-offset:3px;cursor:pointer;font:inherit;padding:7px 0}.empty-results{padding:36px 15px;text-align:center;color:#64748b;border:1px dashed #cbd5e1;border-radius:10px}[hidden]{display:none!important}input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid #64748b;outline-offset:3px}@media(max-width:420px){.movie-stats{gap:7px}.stat{padding:13px 6px}.stat strong{font-size:23px}.movie-filters{grid-template-columns:minmax(0,1fr)}.search-field{grid-column:auto}}.filter-panel{margin-bottom:24px;border:1px solid #e2e8f0;border-radius:10px}.filter-panel summary{padding:13px 16px;cursor:pointer;color:#475569;font-size:14px}.filter-panel summary:focus-visible{outline:2px solid #64748b;outline-offset:3px}.filter-panel[open] summary{border-bottom:1px solid #e2e8f0}.filter-panel-content{padding:18px 16px 0}.filter-panel .filter-status{margin-bottom:14px}.movie-runtime{font-size:14px;color:#64748b;margin-top:12px}.duration-summary{border:1px solid #e2e8f0;background:#f8fafc;border-radius:12px;padding:24px;margin-top:30px}.duration-summary h2{font-size:18px;color:#334155;margin-bottom:18px}.duration-summary .movie-stats{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:16px}.duration-summary .stat{background:white}.duration-text{font-size:15px;line-height:1.9;color:#334155}.duration-note{font-size:12px;color:#64748b;margin-top:12px;line-height:1.7}</style></head><body><main class="page-container"><a class="back-link" href="/records/">← 返回生活记录</a><h1 class="page-title">MovieLife</h1><details class="filter-panel"><summary>筛选</summary><div class="filter-panel-content"><div class="movie-filters"><label>观看年份<select id="filter-year"><option value="all">全部年份</option></select></label><label>导演<select id="filter-director"><option value="all">全部导演</option></select></label><label class="search-field">片名<input id="filter-search" type="search" placeholder="搜索中文或外文片名" autocomplete="off"></label></div><div class="filter-status"><span id="filter-summary" role="status"></span><button class="reset-filters" id="reset-filters" type="button">重置筛选</button></div></div></details>{% assign films = site.data.movies | sort: 'date' | reverse %}{% for movie in films %}<article class="record-card" data-movie data-minutes="{{ movie.minutes }}" style="--theme-color:{{ movie.color }}"><div class="book-cover-wrapper"><img class="book-cover-img" src="{{ movie.poster | escape }}" alt="《{{ movie.title | escape }}》电影海报" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true;this.nextElementSibling.style.display='flex'"><div class="poster-fallback">《{{ movie.title | escape }}》<br>海报暂不可用</div></div><div class="book-details"><div class="details-header"><h2 class="book-title text-accent"><a href="{{ movie.url | escape }}" target="_blank" rel="noopener noreferrer">《{{ movie.title | escape }}》</a></h2><time class="book-date text-accent" datetime="{{ movie.date }}">{{ movie.date | date: '%Y年%m月%d日' }}</time></div><p class="movie-original">{{ movie.english | escape }}</p><p class="movie-director text-accent">导演：{{ movie.director | escape }}</p><p class="movie-runtime">时长：{{ movie.minutes }} 分钟{% if movie.edition %} · {{ movie.edition | escape }}{% endif %}</p></div></article>{% endfor %}<p id="empty-results" class="empty-results" hidden>没有符合条件的电影。</p><section class="duration-summary" aria-labelledby="statistics-title"><h2 id="statistics-title">观看统计</h2><div class="movie-stats"><div class="stat"><strong id="total-count">—</strong><span>累计观看 / 部</span></div><div class="stat"><strong id="total-duration">—</strong><span>累计时长 / 小时</span></div><div class="stat"><strong id="match-count">—</strong><span>当前筛选 / 部</span></div><div class="stat"><strong id="match-duration">—</strong><span>筛选时长 / 小时</span></div></div><p id="duration-text" class="duration-text" aria-live="polite"></p><p class="duration-note">当前筛选涉及 <span id="director-count">—</span> 位导演。时长按每条记录的电影片长累计。</p></section></main><script src="/assets/js/movielife.js" defer></script></body></html>
