@@ -50,7 +50,7 @@
     "date": "2026-06-20",
     "url": "https://movie.douban.com/subject/1478066/",
     "minutes": 132,
-    "poster": "https://pics.filmaffinity.com/Banderas_de_nuestros_padres-702932310-large.jpg",
+    "poster": "/assets/images/movies/flags-of-our-fathers.png",
     "durationSource": "https://www.paramount.com/movies/flags-of-our-fathers",
     "color": "#665631"
   },
@@ -100,5 +100,16 @@
     "durationSource": "https://www.classificationoffice.govt.nz/find-a-rating/quick-takes/the-lord-of-the-rings-the-return-of-the-king/",
     "edition": "院线版",
     "color": "#776128"
+  },
+  {
+    "title": "血战台儿庄",
+    "english": "The Battle of Tai'erzhuang",
+    "director": "杨光远、翟俊杰",
+    "date": "2026-11-07",
+    "minutes": 140,
+    "url": "https://www.1905.com/mdb/film/361709/",
+    "poster": "https://image.tmdb.org/t/p/w600_and_h900_face/hed9RFqawfGPun7jbYesMhuRrri.jpg",
+    "durationSource": "https://www.1905.com/mdb/film/361709/info/",
+    "color": "#823b2e"
   }
 ]
