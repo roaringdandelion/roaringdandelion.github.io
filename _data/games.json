@@ -51,7 +51,7 @@
     "platform": "XBOX",
     "duration": 11.9,
     "date": "2024-07-12",
-    "url": "https://store.steampowered.com/app/1307580/TOEM_A_Photo_Adventure/"
+    "url": "https://www.xbox.com/en-US/games/store/toem/9N7ZCLLR01B3"
   },
   {
     "id": 7,
@@ -184,34 +184,52 @@
     "name": "最终幻想 像素复刻版",
     "platform": "XBOX",
     "duration": 19,
-    "date": "2026-04-13"
+    "date": "2026-04-13",
+    "url": "https://www.xbox.com/en-US/games/store/-/9P20JCF7BV93",
+    "engName": "Final Fantasy (Pixel Remaster)"
   },
   {
     "id": 22,
     "name": "刺客信条 幻境",
     "platform": "XBOX",
     "duration": 64,
-    "date": "2026-04-28"
+    "date": "2026-04-28",
+    "url": "https://www.xbox.com/en-US/games/store/-/9NZCJF5VF1NV",
+    "engName": "Assassin's Creed Mirage"
   },
   {
     "id": 23,
     "name": "刺客信条 起源",
     "platform": "XBOX",
     "duration": 139,
-    "date": "2026-06-05"
+    "date": "2026-06-05",
+    "url": "https://www.xbox.com/en-US/games/store/-/BZGJRJC1FGF3",
+    "engName": "Assassin's Creed Origins"
   },
   {
     "id": 24,
     "name": "Mixtape",
     "platform": "XBOX",
     "duration": 13,
-    "date": "2026-06-28"
+    "date": "2026-06-28",
+    "url": "https://mixtape.game/"
   },
   {
     "id": 25,
     "name": "夺宝奇兵 古老之圈",
     "platform": "XBOX",
     "duration": 81,
-    "date": "2026-08-24"
+    "date": "2026-08-24",
+    "url": "https://www.xbox.com/en-US/games/store/-/9N8FQ28Z6QX3",
+    "engName": "Indiana Jones and the Great Circle"
+  },
+  {
+    "id": 26,
+    "name": "如龙8 无尽财富",
+    "date": "2026-11-07",
+    "platform": "XBOX",
+    "duration": 249,
+    "url": "https://ryu-ga-gotoku.com/eight/cn/",
+    "engName": "Like a Dragon: Infinite Wealth"
   }
 ]
