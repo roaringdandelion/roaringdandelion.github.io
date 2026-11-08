@@ -5,15 +5,202 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>岛田庄司小说系列发表顺序</title>
     <!-- 导入你的 CSS 样式文件 -->
-    <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="/assets/css/return-link.css">
-</head>
+    
+
+<style>:root {
+            --mitarai-color: #2c3e50; /* 御手洗系列：深蓝色 */
+            --yoshiki-color: #27ae60; /* 吉敷系列：墨绿色 */
+            --accent-color: #e74c3c;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #7f8c8d;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Microsoft YaHei', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-main);
+            margin-bottom: 40px;
+            font-size: 2.2rem;
+        }
+
+        /* 时间轴样式设计 */
+        .timeline-container {
+            position: relative;
+            padding-left: 20px;
+        }
+
+        /* 隐藏的垂直线（可选，为了增加时间轴的视觉引导） */
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: var(--border-color);
+            border-radius: 2px;
+        }
+
+        .book-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+
+        /* 时间轴节点的小圆点 */
+        .book-card::before {
+            content: '';
+            position: absolute;
+            left: -24px; /* 定位到主时间轴线上 */
+            top: 15px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: inherit;
+        }
+
+        .book-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            color: white;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .card-body {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .edition-col {
+            padding-right: 15px;
+            border-right: 1px dashed var(--border-color);
+        }
+        
+        .edition-col:last-child {
+            border-right: none;
+            padding-right: 0;
+        }
+
+        .edition-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 4px;
+        }
+
+        .edition-date {
+            font-size: 0.8rem;
+            color: #95a5a6;
+            font-family: monospace;
+        }
+
+        .book-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-main);
+            margin: 10px 0;
+        }
+
+        .note-badge {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+            font-weight: normal;
+        }
+
+        .story-list-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+            margin-bottom: 4px;
+        }
+
+        .story-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .story-list li {
+            position: relative;
+            padding-left: 15px;
+            margin-bottom: 4px;
+        }
+
+        .story-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--text-muted);
+        }
+
+        /* 手机端响应式 */
+        @media (max-width: 768px) {
+            .card-body {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .edition-col {
+                border-right: none;
+                border-bottom: 1px dashed var(--border-color);
+                padding-right: 0;
+                padding-bottom: 15px;
+            }
+            .edition-col:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+        }
+
+*{box-sizing:border-box}body{background:#fcfbf7;color:#111;padding:clamp(12px,4vw,48px)}.container{max-width:1120px}.site-return-link{display:inline-block;color:#513879;font-weight:750;margin-bottom:14px}.archive-hero{display:grid;grid-template-columns:minmax(0,1fr) 22%;border:6px solid #111;margin-bottom:28px;background:#fff}.archive-heading{padding:clamp(18px,4vw,45px)}.archive-heading p{font-size:12px;font-weight:900;letter-spacing:.14em;margin:0 0 10px;color:#513879}.archive-heading h1{text-align:left;font-size:clamp(26px,4vw,54px);line-height:1.12;margin:0;color:#111}.archive-heading small{display:block;margin-top:12px;color:#555}.archive-colors{border-left:6px solid #111;background:linear-gradient(#513879 0 55%,#111 55% 60%,#ffdb00 60%)}.timeline-container{padding-left:0;display:grid;gap:14px}.timeline-container::before,.book-card::before{display:none}.book-card,.book-card:hover{border:4px solid #111;border-radius:0;box-shadow:none;margin:0;transform:none}.card-header{border-bottom:4px solid #111;background:#513879!important;color:white}.book-card[data-series="yoshiki"] .card-header{background:#ffdb00!important;color:#111}.card-body{gap:0;padding:0}.edition-col,.edition-col:last-child{min-width:0;padding:18px}.edition-col{border-right:2px solid #111}.edition-col:first-child{background:#f2edf8}.edition-label{color:#513879;border-color:#51387955;font-weight:750}.edition-date{color:#4e405e}.book-title{overflow-wrap:anywhere}@media(max-width:680px){.card-body{grid-template-columns:1fr}.edition-col{border-right:0;border-bottom:2px solid #111}.edition-col:last-child{border-bottom:0}}
+body{background:#fcfbf7 linear-gradient(#fcfbf7ad,#fcfbf7ad);background-image:linear-gradient(#fcfbf7ad,#fcfbf7ad),url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20220%20350%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20fill%3D%22%23f8f8f4%22%20d%3D%22M0%200h220v350H0z%22%2F%3E%3Cpath%20fill%3D%22%23e52b23%22%20d%3D%22M60%200h160v140H60z%22%2F%3E%3Cpath%20fill%3D%22%23ffdb00%22%20d%3D%22M0%20225h18v125H0z%22%2F%3E%3Cpath%20fill%3D%22%23244780%22%20d%3D%22M179%20281h41v69h-41z%22%2F%3E%3Cpath%20fill%3D%22%23181818%22%20d%3D%22M0%200h59v28H0zM0%20204h18v21H0z%22%2F%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23181818%22%20stroke-width%3D%224.5%22%20d%3D%22M59%200v350m0-210h161M0%20204h214M18%20204v146m41-69h161m-41%200v69m35-210v141M59%20348h161%22%2F%3E%3C%2Fsvg%3E");background-position:center;background-size:100% 100%;background-attachment:fixed;background-repeat:no-repeat}.site-return-link{background:#fcfbf7;border:3px solid #111;padding:5px 10px}.edition-col{background:#fff}.edition-col:first-child{background:#f2edf8}</style></head>
 <body>
 
 <div class="container">
 <a class="site-return-link" href="/notes/">← 返回杂谈</a>
 
-    <h1>岛田庄司小说发表时间轴</h1>
+    <header class="archive-hero"><div class="archive-heading"><p>SHIMADA ARCHIVE</p><h1>岛田庄司小说发表时间轴</h1><small>御手洗洁和吉敷竹史两大系列<br>按日文首版日期排序 · 对照日文、繁中和简中版本</small></div><div class="archive-colors" aria-hidden="true"></div></header>
     <div class="timeline-container" id="timeline-container"></div>
 </div>
 
@@ -49,10 +236,10 @@
                        `</ul>`;
             };
 
-            const formatDate = (date) => date ? date : '-';
+            const formatDate = (date) => date || '';
 
             html += `
-            <div class="book-card">
+            <div class="book-card" data-series="${book.series}">
                 <div class="card-header" style="background-color: ${seriesInfo.color};">
                     ${seriesInfo.name}
                 </div>
@@ -71,7 +258,7 @@
                             <span>繁中版</span>
                             <span class="edition-date">${formatDate(book.tc.date)}</span>
                         </div>
-                        <h3 class="book-title">${book.tc.title || '<span style="color:#ccc;font-weight:normal;">待补充</span>'}</h3>
+                        <h3 class="book-title">${book.tc.title === '暂未出版' ? '' : (book.tc.title || '')}</h3>
                         ${generateList(book.tc.stories)}
                     </div>
                     
@@ -80,7 +267,7 @@
                             <span>简中版</span>
                             <span class="edition-date">${formatDate(book.sc.date)}</span>
                         </div>
-                        <h3 class="book-title">${book.sc.title || '<span style="color:#ccc;font-weight:normal;">待补充</span>'}</h3>
+                        <h3 class="book-title">${book.sc.title === '暂未出版' ? '' : (book.sc.title || '')}</h3>
                         ${generateList(book.sc.stories)}
                     </div>
                 </div>
