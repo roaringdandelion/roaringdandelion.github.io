@@ -3,9 +3,148 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0d1721" />
+    <meta name="theme-color" content="#efece1" />
     <title>Minesweeper Mini</title>
-    <link rel="stylesheet" href="./style.css" />
+    <style>:root {
+  color-scheme: dark;
+  --ink: #edf4f2;
+  --muted: #8b9b9d;
+  --canvas: #0d1721;
+  --panel: #122330;
+  --panel-light: #182c39;
+  --line: #29404a;
+  --tile: #1e3946;
+  --tile-hover: #2a4a57;
+  --open: #152b37;
+  --accent: #f4c95d;
+  --danger: #ef6a6a;
+  --mint: #80d4b4;
+}
+
+* { box-sizing: border-box; }
+
+.site-back { display: inline-block; margin-bottom: 24px; color: var(--muted); font: 14px/1.6 system-ui, sans-serif; text-underline-offset: 4px; }
+.site-back:hover { color: var(--accent); }
+.site-back:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--ink);
+  background: var(--canvas);
+  font-family: Georgia, 'Times New Roman', serif;
+  background-image: radial-gradient(circle at 15% 15%, rgba(128, 212, 180, .12), transparent 25%), linear-gradient(125deg, rgba(244, 201, 93, .04), transparent 42%);
+}
+
+button, select { font: inherit; }
+
+.game-shell { width: min(100% - 32px, 620px); margin: 0 auto; padding: 52px 0 28px; }
+.topbar { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 30px; }
+.eyebrow { display: block; margin-bottom: 9px; color: var(--accent); font: 700 11px/1.2 Consolas, monospace; letter-spacing: .14em; }
+h1 { margin: 0; font-size: clamp(38px, 8vw, 66px); line-height: .94; letter-spacing: -.04em; }
+.brand-block p { margin: 14px 0 0; color: var(--muted); font-size: 17px; }
+.icon-button { width: 46px; height: 46px; border: 1px solid var(--line); border-radius: 50%; color: var(--accent); background: var(--panel); font-size: 25px; cursor: pointer; transition: transform .2s, background .2s; }
+.icon-button:hover { background: var(--panel-light); transform: rotate(-35deg); }
+
+.game-panel { padding: 22px; border: 1px solid var(--line); background: rgba(18, 35, 48, .9); box-shadow: 0 22px 55px rgba(0, 0, 0, .22); }
+.status-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 2px 3px 20px; }
+.metric { display: flex; flex-direction: column; gap: 3px; }
+.metric-right { align-items: flex-end; }
+.metric-label { color: var(--muted); font: 700 10px/1.2 Consolas, monospace; letter-spacing: .16em; text-transform: uppercase; }
+.metric strong { color: var(--accent); font: 700 27px/1 Consolas, monospace; letter-spacing: .06em; }
+.face { display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: var(--mint); font-size: 15px; }
+.controls { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font: 12px Consolas, monospace; }
+.controls label { text-transform: uppercase; letter-spacing: .1em; }
+select { padding: 7px 28px 7px 9px; border: 1px solid var(--line); border-radius: 2px; color: var(--ink); background: var(--panel-light); cursor: pointer; }
+.hint { margin-left: auto; color: #6e8083; font-size: 11px; text-align: right; }
+.powerups { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 16px; }
+.power-card { display: flex; align-items: center; gap: 10px; min-height: 57px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 2px; background: #152c38; }
+.power-copy { min-width: 0; flex: 1; }
+.power-button { padding: 6px 9px; border: 1px solid var(--line); border-radius: 2px; color: var(--accent); background: var(--panel-light); font: 700 10px Consolas, monospace; cursor: pointer; transition: border-color .15s, background .15s, opacity .15s; }
+.power-button:hover:not(:disabled), .power-button.active { border-color: var(--accent); background: #1d3a45; }
+.power-button:disabled, .power-button.spent { opacity: .42; cursor: default; }
+.power-icon { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid #49636a; border-radius: 50%; color: var(--accent); font: 18px/1 Georgia, serif; }
+.power-button strong, .power-button small { display: block; }
+.power-button strong { font: 700 12px Consolas, monospace; }
+.power-button small { margin-top: 4px; color: var(--muted); font: 10px Consolas, monospace; }
+.switch { display: inline-flex; align-items: center; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; pointer-events: none; }
+.switch-track { position: relative; display: block; width: 31px; height: 18px; border-radius: 20px; background: #30464f; transition: background .15s; }
+.switch-track::after { position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--muted); content: ''; transition: transform .15s, background .15s; }
+.switch input:checked + .switch-track { background: #58785f; }
+.switch input:checked + .switch-track::after { background: var(--accent); transform: translateX(13px); }
+.switch input:focus-visible + .switch-track { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.board-wrap { overflow: auto; padding: 8px; background: #0b151e; border: 1px solid #203640; }
+.board { display: grid; width: 100%; gap: 3px; aspect-ratio: 1; }
+.cell { display: grid; min-width: 0; aspect-ratio: 1; place-items: center; padding: 0; border: 1px solid #2b4a56; border-radius: 2px; color: var(--ink); background: var(--tile); font: 700 clamp(12px, 3.4vw, 21px)/1 Consolas, monospace; cursor: pointer; transition: background .12s, transform .12s; }
+.cell:hover:not(.revealed) { background: var(--tile-hover); transform: translateY(-1px); }
+.cell.revealed { border-color: #183742; background: var(--open); cursor: default; }
+.cell.flagged { color: var(--accent); }
+.cell.mine { color: #fff; background: var(--danger); border-color: #ff8d8d; }
+.cell.exploded { color: #fff; background: #c74747; }
+.cell.scanned { border-color: #57716c; background: #223f45; box-shadow: inset 0 0 0 1px rgba(128, 212, 180, .16); }
+.cell.scanned-mine { color: var(--danger); background: #3a3031; }
+.cell[data-number="1"] { color: #6fc3ed; }
+.cell[data-number="2"] { color: #80d4b4; }
+.cell[data-number="3"] { color: #f29a6b; }
+.cell[data-number="4"], .cell[data-number="5"] { color: #d9a7ed; }
+.message { min-height: 24px; padding: 18px 2px 0; color: var(--muted); font-size: 15px; text-align: center; }
+.message.win { color: var(--mint); }
+.message.lose { color: var(--danger); }
+.message.saved, .message.scan-message { color: var(--accent); }
+.result-dialog { width: min(90vw, 390px); padding: 30px; border: 1px solid var(--line); border-radius: 2px; color: var(--ink); background: #122330; box-shadow: 0 24px 80px rgba(0, 0, 0, .55); }
+.result-dialog::backdrop { background: rgba(5, 12, 17, .76); backdrop-filter: blur(4px); }
+.dialog-kicker { color: var(--accent); font: 700 10px Consolas, monospace; letter-spacing: .16em; }
+.result-dialog h2 { margin: 10px 0 8px; font-size: 36px; line-height: 1; }
+.result-dialog p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.5; }
+.result-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 24px 0; }
+.result-stats span { padding: 11px; border: 1px solid var(--line); background: var(--panel-light); }
+.result-stats small, .result-stats strong { display: block; }
+.result-stats small { color: var(--muted); font: 10px Consolas, monospace; text-transform: uppercase; }
+.result-stats strong { margin-top: 6px; color: var(--accent); font: 700 20px Consolas, monospace; }
+.dialog-button { width: 100%; padding: 11px; border: 1px solid var(--accent); border-radius: 2px; color: #17232a; background: var(--accent); font: 700 12px Consolas, monospace; cursor: pointer; }
+.footer-note { display: flex; align-items: center; gap: 8px; margin-top: 18px; color: #607477; font: 11px Consolas, monospace; letter-spacing: .03em; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+@media (max-width: 520px) {
+  .game-shell { width: min(100% - 20px, 620px); padding-top: 30px; }
+  .game-panel { padding: 14px; }
+  .controls { align-items: flex-start; flex-wrap: wrap; }
+  .hint { width: 100%; margin-left: 0; text-align: left; }
+  .powerups { grid-template-columns: 1fr; }
+  .board-wrap { padding: 5px; }
+  .board { gap: 2px; }
+}
+
+.cell .tile-icon{font-family:system-ui,sans-serif;font-size:88cqw;font-weight:900;line-height:1}
+:root{color-scheme:light;--ink:#111;--muted:#414141;--line:#111;--accent:#0045c8;--tile:#f1efe7;--tile-hover:#ffdb00;--open:#fff;--danger:#cf1018;--mint:#176431;--paper:#fcfbf7}
+body{background:#efece1 url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20347%20350%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20fill%3D%22%23f5f3e9%22%20d%3D%22M0%200h347v350H0z%22%2F%3E%3Cpath%20fill%3D%22%23e5282d%22%20d%3D%22M0%200h149v193H0z%22%2F%3E%3Cpath%20fill%3D%22%23f8f6ee%22%20d%3D%22M0%20193h149v157H0z%22%2F%3E%3Cpath%20fill%3D%22%23f5f2dc%22%20d%3D%22M149%20193h173v145H149z%22%2F%3E%3Cpath%20fill%3D%22%2340567e%22%20d%3D%22M322%20193h25v65h-25z%22%2F%3E%3Cpath%20fill%3D%22%23f5c94d%22%20d%3D%22M149%20338h96v12h-96z%22%2F%3E%3Cpath%20fill%3D%22%23171717%22%20d%3D%22M245%20338h77v12h-77z%22%2F%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23181818%22%20stroke-width%3D%227%22%20d%3D%22M149%200v350M0%20193h347M322%20193v157M322%20259h25M149%20337h173%22%2F%3E%3C%2Fsvg%3E") center / 100% 100% fixed no-repeat;font-family:system-ui,sans-serif;color:#111}
+body::before{position:fixed;inset:0;content:"";pointer-events:none;background:rgba(252,251,247,.10);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}.game-shell{position:relative;width:min(calc(100% - 24px),660px);padding:24px 0 36px}
+.site-back{background:#fff;border:3px solid #111;color:#111;padding:6px 12px;margin-bottom:14px;text-decoration:none;font-weight:750}
+.topbar{display:grid;grid-template-columns:14px minmax(0,1fr) 19%;align-items:stretch;gap:4px;background:#111;border:4px solid #111;margin-bottom:14px}
+.topbar::before{content:'';background:#ffdb00}.brand-block{background:var(--paper);padding:16px clamp(9px,3vw,24px)}
+.eyebrow{color:#0045c8}.brand-block h1{font-size:clamp(22px,7.1vw,55px);line-height:1.12}.brand-block p{font-size:13px;margin-top:8px}
+.icon-button{width:100%;height:100%;min-height:60px;background:#cf1018;color:#fff;border:0;border-radius:0;font-size:34px}.icon-button:hover{background:#ad1018;transform:none}
+.game-panel{background:var(--paper);border:4px solid #111;padding:clamp(8px,2.5vw,18px);box-shadow:none}
+.status-row{background:#111;border:3px solid #111;gap:3px;padding:0;align-items:stretch;grid-template-columns:1fr 52px 1fr;margin-bottom:12px}
+.metric{background:#0045c8;color:white;padding:9px 12px}.metric-right{background:#ffdb00;color:#111}.metric-label,.metric strong{color:inherit}.face{border:0;border-radius:0;width:auto;height:auto;color:white;background:#cf1018}
+.controls{border-top:0;padding:0;color:#111}.hint{color:#444}select{background:white;color:#111;border:2px solid #111;border-radius:0}
+.power-card{background:white;border:2px solid #111;border-radius:0}.power-icon{background:#ffdb00;color:#111;border:2px solid #111;border-radius:0;flex-shrink:0}.power-copy small{display:block;color:#414141;font-size:12px}
+.power-button,.dialog-button{background:#0045c8;color:#fff;border:2px solid #111;border-radius:0}.power-button:hover:not(:disabled),.power-button.active{background:#ffdb00;color:#111;border-color:#111}
+.switch-track{background:#777;border-radius:0}.switch-track::after{background:#fff;border-radius:0}.switch input:checked+.switch-track{background:#0045c8}.switch input:checked+.switch-track::after{background:#ffdb00}
+.board-wrap{padding:0;border:3px solid #111;background:#111;overflow:visible}.board{gap:2px}
+.cell,.cell.revealed,.cell.scanned{border:0;border-radius:0;transform:none;box-shadow:none;min-height:0;font-size:clamp(9px,2.9vw,19px)}.cell:hover:not(.revealed){transform:none}.cell[data-number]{color:#0045a0}.cell[data-number="2"]{color:#176431}.cell[data-number="3"]{color:#b11019}
+.cell{container-type:inline-size}.cell[data-number]{font-family:system-ui,sans-serif;font-weight:900;font-size:clamp(12px,3.8vw,29px);line-height:1}.cell[data-number] .tile-number{font-size:76cqw}
+.cell.flagged{color:#a50b16;background:#ffdb00}.cell.scanned{background:#c5dcff}.cell.scanned-mine,.cell.mine,.cell.exploded{background:#cf1018;color:white}
+.result-dialog{background:white;color:#111;border:4px solid #111;border-top:10px solid #ffdb00;border-radius:0;box-shadow:none}.result-stats span{background:#f1efe7}.result-dialog::backdrop{background:#111a;backdrop-filter:none}
+:is(button,select,a):focus-visible{outline:3px solid #0045c8;outline-offset:2px}.cell:focus-visible{outline-offset:-3px}
+.powerups{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.power-card{min-width:0;flex-wrap:wrap;gap:6px}.power-copy{flex:1 1 70px}.power-card .power-button{margin-right:auto}.world-card .power-icon{background:#0045c8;color:white}
+.help-button{margin-left:auto;width:38px;height:38px;border:2px solid #111;background:#ffdb00;color:#111;font-weight:900;font-size:20px;cursor:pointer}.help-dialog{max-height:85vh;overflow:auto}.help-dialog ol{padding-left:22px;color:#222}.help-dialog li{margin-bottom:8px}.help-dialog form{margin-top:18px}
+@media(max-width:560px){.powerups{grid-template-columns:1fr}.power-card{flex-wrap:nowrap}}
+.footer-note{height:16px;background:linear-gradient(90deg,#111 0 13%,#0045c8 13% 31%,#111 31% calc(31% + 3px),#cf1018 calc(31% + 3px) 77%,#111 77% calc(77% + 3px),#ffdb00 calc(77% + 3px));border:3px solid #111}
+</style>
   </head>
   <body>
     <main class="game-shell">
@@ -14,7 +153,7 @@
         <div class="brand-block">
           <span class="eyebrow">MINI ARCADE / 01</span>
           <h1>Minesweeper</h1>
-          <p>Clear the field. Trust your instincts.</p>
+          <p>扫雷 · 翻开方块，标记地雷。</p>
         </div>
         <button class="icon-button" id="reset-button" type="button" aria-label="Start a new game" title="New game">↻</button>
       </header>
@@ -28,12 +167,8 @@
 
         <div class="controls">
           <label for="difficulty">Board</label>
-          <select id="difficulty">
-            <option value="easy">Easy · 9 × 9</option>
-            <option value="medium">Medium · 12 × 12</option>
-            <option value="hard">Hard · 16 × 16</option>
-          </select>
-          <span class="hint">Left click reveal · right click flag</span>
+          <select id="difficulty"><option value="6x6-5">6 × 6 | 5 mines</option><option value="8x8-10">8 × 8 | 10 mines</option><option value="9x9-10" selected>9 × 9 | 10 mines</option><option value="9x9-15">9 × 9 | 15 mines</option><option value="12x12-22">12 × 12 | 22 mines</option><option value="12x12-32">12 × 12 | 32 mines</option><option value="16x16-40">16 × 16 | 40 mines</option><option value="16x16-56">16 × 16 | 56 mines</option><option value="20x20-65">20 × 20 | 65 mines</option></select>
+          <button class="help-button" id="help-button" type="button" aria-label="How to play" aria-haspopup="dialog">?</button>
         </div>
 
         <div class="powerups" aria-label="Power-ups">
@@ -56,8 +191,17 @@
               <span class="sr-only">Enable scanner</span>
             </label>
           </div>
+          <div class="power-card world-card">
+          <span class="power-icon" aria-hidden="true">◷</span>
+          <span class="power-copy"><strong>The World</strong><small id="world-status">Freeze Time</small></span>
+          <button class="power-button" id="world-button" type="button" disabled>Use</button>
+          <label class="switch" title="Enable The World">
+            <input id="world-toggle" type="checkbox" checked />
+            <span class="switch-track"></span>
+            <span class="sr-only">Enable The World</span>
+          </label>
+          </div>
         </div>
-
         <div class="board-wrap">
           <div id="board" class="board" role="grid" aria-label="Minesweeper board"></div>
         </div>
@@ -65,18 +209,331 @@
         <div class="message" id="message" aria-live="polite">Pick a tile to begin.</div>
       </section>
 
-      <footer class="footer-note"><span class="dot"></span> A tiny game of probability and nerve</footer>
+      <footer class="footer-note" aria-hidden="true"></footer>
     </main>
+    <dialog class="result-dialog help-dialog" id="help-dialog" aria-labelledby="help-title">
+      <h2 id="help-title">How to play</h2>
+      <ol>
+        <li>Left-click a tile to reveal it. Your first reveal is always safe.</li>
+        <li>A number tells you how many mines touch the tile, including diagonals.</li>
+        <li>Right-click a hidden tile to place or remove a flag. Reveal every safe tile to win.</li>
+      </ol>
+      <h3>Power-ups</h3>
+      <p><strong>Extra Life:</strong> Survive one mine hit. <strong>Scanner:</strong> Inspect a 3 × 3 area. <strong>The World:</strong> Freeze the timer for 15 seconds once per round.</p>
+      <form method="dialog"><button class="dialog-button" autofocus>Close</button></form>
+    </dialog>
     <dialog class="result-dialog" id="result-dialog" aria-labelledby="result-title">
       <div class="dialog-kicker">ROUND COMPLETE</div>
       <h2 id="result-title">Field cleared</h2>
       <p id="result-summary">You found every mine.</p>
       <div class="result-stats">
         <span><small>Time</small><strong id="result-time">000s</strong></span>
-        <span><small>Board</small><strong id="result-board">Easy</strong></span>
+        <span><small>Board</small><strong id="result-board">9 × 9 | 10 mines</strong></span>
       </div>
       <button class="dialog-button" id="dialog-restart" type="button">Play again</button>
     </dialog>
-    <script src="./script.js"></script>
+    <script>const levels = {"6x6-5":{"size":6,"mines":5},"8x8-10":{"size":8,"mines":10},"9x9-10":{"size":9,"mines":10},"9x9-15":{"size":9,"mines":15},"12x12-22":{"size":12,"mines":22},"12x12-32":{"size":12,"mines":32},"16x16-40":{"size":16,"mines":40},"16x16-56":{"size":16,"mines":56},"20x20-65":{"size":20,"mines":65}};
+
+const boardElement = document.querySelector('#board');
+const mineCountElement = document.querySelector('#mine-count');
+const timerElement = document.querySelector('#timer');
+const messageElement = document.querySelector('#message');
+const faceElement = document.querySelector('#face');
+const resetButton = document.querySelector('#reset-button');
+const difficultyElement = document.querySelector('#difficulty');
+const healthButton = document.querySelector('#health-button');
+const healthStatusElement = document.querySelector('#health-status');
+const healthToggle = document.querySelector('#health-toggle');
+const scannerButton = document.querySelector('#scanner-button');
+const scannerStatusElement = document.querySelector('#scanner-status');
+const scannerToggle = document.querySelector('#scanner-toggle');
+const resultDialog = document.querySelector('#result-dialog');
+const resultTitle = document.querySelector('#result-title');
+const resultSummary = document.querySelector('#result-summary');
+const resultTime = document.querySelector('#result-time');
+const resultBoard = document.querySelector('#result-board');
+const dialogRestart = document.querySelector('#dialog-restart');
+
+let state;
+let timerId;
+let worldUntil = 0;
+const worldButton = document.querySelector('#world-button');
+const worldStatus = document.querySelector('#world-status');
+const worldToggle = document.querySelector('#world-toggle');
+function setWorldStatus(enabledText) {
+  worldStatus.textContent = worldToggle.checked ? enabledText : 'Disabled';
+}
+worldToggle.addEventListener('change', () => {
+  worldButton.disabled = !worldToggle.checked || !state.started || state.finished || Boolean(worldUntil);
+  const remaining = worldUntil - performance.now();
+  setWorldStatus(state.finished ? 'Freeze Time · Round over' : remaining > 0 ? 'Freeze Time · ' + Math.ceil(remaining / 1000) + 's' : worldUntil ? 'Freeze Time · Used' : state.started ? 'Freeze Time · Once per round' : 'Freeze Time');
+});
+worldButton.addEventListener('click', () => {
+  if (!worldToggle.checked || !state.started || state.finished || worldUntil) return;
+  worldUntil = performance.now() + 15000;
+  worldButton.disabled = true;
+  setWorldStatus('Freeze Time · 15s');
+});
+
+function newGame(levelName = difficultyElement.value) {
+  const { size, mines } = levels[levelName];
+  clearInterval(timerId);
+  worldUntil = 0;
+  worldButton.disabled = true;
+  setWorldStatus('Freeze Time');
+  state = { size, mines, flags: 0, elapsed: 0, started: false, finished: false, scanMode: false, extraLife: true, scannerUsed: false, extraLifeEnabled: healthToggle.checked, scannerEnabled: scannerToggle.checked, cells: [] };
+  resultDialog.close();
+  timerElement.textContent = '000';
+  mineCountElement.textContent = String(mines).padStart(3, '0');
+  faceElement.textContent = '●';
+  messageElement.textContent = 'Pick a tile to begin.';
+  messageElement.className = 'message';
+  updatePowerups();
+  createEmptyBoard();
+}
+
+function createEmptyBoard() {
+  boardElement.innerHTML = '';
+  boardElement.style.gridTemplateColumns = `repeat(${state.size}, 1fr)`;
+  for (let index = 0; index < state.size * state.size; index += 1) {
+    const cell = { mine: false, adjacent: 0, revealed: false, flagged: false, scanned: false };
+    state.cells.push(cell);
+    const element = document.createElement('button');
+    element.className = 'cell';
+    element.type = 'button';
+    element.setAttribute('role', 'gridcell');
+    element.setAttribute('aria-label', `Hidden tile ${index + 1}`);
+    element.dataset.index = index;
+    element.addEventListener('click', () => reveal(index));
+    element.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+      toggleFlag(index);
+    });
+    boardElement.appendChild(element);
+  }
+}
+
+function plantMines(firstIndex) {
+  const safeZone = new Set([firstIndex, ...neighbors(firstIndex)]);
+  const available = state.cells.map((_, index) => index).filter((index) => !safeZone.has(index));
+  for (let index = available.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [available[index], available[randomIndex]] = [available[randomIndex], available[index]];
+  }
+  available.slice(0, state.mines).forEach((index) => { state.cells[index].mine = true; });
+  state.cells.forEach((cell, index) => {
+    cell.adjacent = neighbors(index).filter((neighbor) => state.cells[neighbor].mine).length;
+  });
+}
+
+function reveal(index) {
+  if (state.finished || state.cells[index].flagged || state.cells[index].revealed) return;
+  if (state.scanMode) {
+    scanArea(index);
+    return;
+  }
+  if (!state.started) {
+    plantMines(index);
+    state.started = true;
+    worldButton.disabled = !worldToggle.checked;
+    setWorldStatus('Freeze Time · Once per round');
+    timerId = setInterval(() => {
+      if (worldUntil) {
+        const remaining = worldUntil - performance.now();
+        setWorldStatus(remaining > 0 ? 'Freeze Time · ' + Math.ceil(remaining / 1000) + 's' : 'Freeze Time · Used');
+        if (remaining > 0) return;
+      }
+      state.elapsed += 1;
+      timerElement.textContent = String(state.elapsed).padStart(3, '0');
+    }, 1000);
+    messageElement.textContent = 'Find the clear path.';
+  }
+  const cell = state.cells[index];
+  if (cell.mine) {
+    cell.revealed = true;
+    renderCell(index, true);
+    if (state.extraLifeEnabled && state.extraLife) {
+      state.extraLife = false;
+      updatePowerups();
+      faceElement.textContent = '♥';
+      messageElement.textContent = 'Extra life spent. The field gives you one more chance.';
+      messageElement.className = 'message saved';
+      return;
+    }
+    finish(false);
+    return;
+  }
+  floodReveal(index);
+  renderBoard();
+  if (state.cells.every((current) => current.mine || current.revealed)) finish(true);
+}
+
+function floodReveal(startIndex) {
+  const queue = [startIndex];
+  const visited = new Set();
+  while (queue.length) {
+    const index = queue.shift();
+    if (visited.has(index) || state.cells[index].flagged) continue;
+    visited.add(index);
+    const cell = state.cells[index];
+    cell.revealed = true;
+    if (cell.adjacent === 0) neighbors(index).forEach((neighbor) => {
+      if (!state.cells[neighbor].mine && !visited.has(neighbor)) queue.push(neighbor);
+    });
+  }
+}
+
+function toggleFlag(index) {
+  if (state.finished || state.cells[index].revealed) return;
+  const cell = state.cells[index];
+  if (!cell.flagged && state.flags >= state.mines) return;
+  cell.flagged = !cell.flagged;
+  state.flags += cell.flagged ? 1 : -1;
+  mineCountElement.textContent = String(Math.max(0, state.mines - state.flags)).padStart(3, '0');
+  renderCell(index);
+}
+
+function scanArea(index) {
+  if (!state.scannerEnabled || state.scannerUsed || state.finished || !state.started) return;
+  state.scannerUsed = true;
+  state.scanMode = false;
+  neighbors(index).concat(index).forEach((neighbor) => { state.cells[neighbor].scanned = true; });
+  updatePowerups();
+  messageElement.textContent = 'Scan complete. Blue tiles are still covered. Reveal all safe tiles to win.';
+  messageElement.className = 'message scan-message';
+  renderBoard();
+}
+
+function activateScanner() {
+  if (!state.scannerEnabled || state.scannerUsed || state.finished) return;
+  if (!state.started) {
+    messageElement.textContent = 'Reveal your first tile before scanning.';
+    return;
+  }
+  state.scanMode = !state.scanMode;
+  scannerButton.classList.toggle('active', state.scanMode);
+  messageElement.textContent = state.scanMode ? 'Choose the center of a 3 × 3 scan.' : 'Scanner cancelled.';
+  messageElement.className = 'message scan-message';
+}
+
+function updatePowerups() {
+  healthButton?.classList.toggle('spent', !state.extraLife);
+  scannerButton.classList.toggle('spent', state.scannerUsed);
+  scannerButton.classList.toggle('active', state.scanMode);
+  healthStatusElement.textContent = !state.extraLifeEnabled ? 'Disabled' : state.extraLife ? 'Ready once' : 'Used this game';
+  scannerStatusElement.textContent = !state.scannerEnabled ? 'Disabled' : state.scannerUsed ? 'Used this game' : '1 scan available';
+  scannerButton.disabled = !state.scannerEnabled || state.scannerUsed;
+  healthToggle.checked = state.extraLifeEnabled;
+  scannerToggle.checked = state.scannerEnabled;
+}
+
+function finish(won) {
+  state.finished = true;
+  worldButton.disabled = true;
+  setWorldStatus('Freeze Time · Round over');
+  clearInterval(timerId);
+  state.cells.forEach((cell, index) => {
+    if (won && cell.mine) cell.flagged = true;
+    if (!won && cell.mine) cell.revealed = true;
+    renderCell(index, !won);
+  });
+  faceElement.textContent = won ? '✦' : '×';
+  messageElement.textContent = won ? `Field cleared in ${state.elapsed}s. Nice work.` : 'A mine got you. Try a new field.';
+  messageElement.className = `message ${won ? 'win' : 'lose'}`;
+  showResult(won);
+}
+
+function showResult(won) {
+  resultTitle.textContent = won ? 'Field cleared' : 'Mine triggered';
+  resultSummary.textContent = won ? 'You found every mine. Excellent nerve.' : 'The field got the better of you this round.';
+  resultTime.textContent = `${String(state.elapsed).padStart(3, '0')}s`;
+  resultBoard.textContent = difficultyElement.options[difficultyElement.selectedIndex].text;
+  resultDialog.showModal();
+}
+
+function renderBoard() { state.cells.forEach((_, index) => renderCell(index)); }
+
+function renderCell(index, showMine = false) {
+  const cell = state.cells[index];
+  const element = boardElement.children[index];
+  element.className = 'cell';
+  element.textContent = '';
+  delete element.dataset.number;
+  if (cell.revealed) {
+    element.classList.add('revealed');
+    if (cell.mine) {
+      element.classList.add(showMine ? 'mine' : 'exploded');
+      const icon = document.createElement('span');
+      icon.className = 'tile-icon';
+      icon.textContent = '✹';
+      element.appendChild(icon);
+    } else if (cell.adjacent) {
+      element.dataset.number = cell.adjacent;
+      const number = document.createElement('span');
+      number.className = 'tile-number';
+      number.textContent = cell.adjacent;
+      element.appendChild(number);
+    }
+  } else if (cell.scanned && !cell.flagged && !state.finished) {
+    element.classList.add('scanned');
+    if (cell.mine) {
+      element.classList.add('scanned-mine');
+      const icon = document.createElement('span');
+      icon.className = 'tile-icon';
+      icon.textContent = '◆';
+      element.appendChild(icon);
+    } else if (cell.adjacent) {
+      element.dataset.number = cell.adjacent;
+      const number = document.createElement('span');
+      number.className = 'tile-number';
+      number.textContent = cell.adjacent;
+      element.appendChild(number);
+    } else {
+      element.textContent = '·';
+    }
+  } else if (cell.flagged) {
+    element.classList.add('flagged');
+    const icon = document.createElement('span');
+      icon.className = 'tile-icon';
+      icon.textContent = '⚑';
+      element.appendChild(icon);
+  }
+  element.setAttribute('aria-label', cell.revealed ? (cell.mine ? 'Mine' : `${cell.adjacent} adjacent mines`) : cell.flagged ? 'Flagged tile' : cell.scanned ? (cell.mine ? 'Scanned mine' : 'Scanned safe tile, still covered') : 'Hidden tile');
+}
+
+function neighbors(index) {
+  const row = Math.floor(index / state.size);
+  const column = index % state.size;
+  const result = [];
+  for (let rowOffset = -1; rowOffset <= 1; rowOffset += 1) {
+    for (let columnOffset = -1; columnOffset <= 1; columnOffset += 1) {
+      if (!rowOffset && !columnOffset) continue;
+      const nextRow = row + rowOffset;
+      const nextColumn = column + columnOffset;
+      if (nextRow >= 0 && nextRow < state.size && nextColumn >= 0 && nextColumn < state.size) result.push(nextRow * state.size + nextColumn);
+    }
+  }
+  return result;
+}
+
+resetButton.addEventListener('click', () => newGame());
+difficultyElement.addEventListener('change', () => newGame());
+scannerButton.addEventListener('click', activateScanner);
+healthToggle.addEventListener('change', () => {
+  state.extraLifeEnabled = healthToggle.checked;
+  updatePowerups();
+});
+scannerToggle.addEventListener('change', () => {
+  state.scannerEnabled = scannerToggle.checked;
+  if (!state.scannerEnabled) {
+    state.scanMode = false;
+  }
+  updatePowerups();
+});
+dialogRestart.addEventListener('click', () => newGame());
+newGame();
+
+document.querySelector('#help-button').addEventListener('click', () => document.querySelector('#help-dialog').showModal());
+</script>
   </body>
 </html>
