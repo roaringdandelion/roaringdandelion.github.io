@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3D Number Puzzle | RD's Corner</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #111; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: #efece1 url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20347%20350%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20fill%3D%22%23f5f3e9%22%20d%3D%22M0%200h347v350H0z%22%2F%3E%3Cpath%20fill%3D%22%23e5282d%22%20d%3D%22M0%200h149v193H0z%22%2F%3E%3Cpath%20fill%3D%22%23f8f6ee%22%20d%3D%22M0%20193h149v157H0z%22%2F%3E%3Cpath%20fill%3D%22%23f5f2dc%22%20d%3D%22M149%20193h173v145H149z%22%2F%3E%3Cpath%20fill%3D%22%2340567e%22%20d%3D%22M322%20193h25v65h-25z%22%2F%3E%3Cpath%20fill%3D%22%23f5c94d%22%20d%3D%22M149%20338h96v12h-96z%22%2F%3E%3Cpath%20fill%3D%22%23171717%22%20d%3D%22M245%20338h77v12h-77z%22%2F%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23181818%22%20stroke-width%3D%227%22%20d%3D%22M149%200v350M0%20193h347M322%20193v157M322%20259h25M149%20337h173%22%2F%3E%3C%2Fsvg%3E") center / 100% 100% fixed no-repeat; }
+    body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: rgba(252,251,247,.10); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+    main { position: relative; width: min(960px, calc(100% - 24px)); margin: 24px auto; }
+    .site-back { display: inline-block; margin-bottom: 14px; padding: 6px 12px; border: 3px solid #111; background: #fff; color: #111; font-weight: 750; text-decoration: none; }
+    .site-back:focus-visible { outline: 3px solid #0045c8; outline-offset: 2px; }
+    header { display: grid; grid-template-columns: 18px 1fr 18%; gap: 4px; background: #111; border: 4px solid #111; }
+    header::before { content: ""; background: #cf1018; }
+    header::after { content: ""; background: #0045c8; }
+    .heading { padding: 24px; background: #fff; }
+    h1 { margin: 0; font-size: clamp(28px, 5vw, 52px); }
+    .heading p { margin: 8px 0 0; }
+    .layout { margin-top: 12px; }
+    .panel { border: 4px solid #111; background: #fff; }
+    .scene-panel { background: #ffdb00; overflow: hidden; }
+    .scene-title { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 16px; border-bottom: 3px solid #111; font-weight: 800; }
+    .board-switch, .layer-switch { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; padding: 10px; border-bottom: 3px solid #111; }
+    .board-switch { margin-left: auto; padding: 0; border: 0; }
+    .board-switch button, .layer-switch button { padding: 5px 12px; }
+    .board-switch button.active, .layer-switch button.active { background: #111; color: #fff; }
+    .layer-switch { background: #fff; }
+    .layer-switch[hidden] { display: none; }
+    .layer-switch button.has-empty::after { content: " ●"; color: #cf1018; }
+    .scene-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .scene-wrap + .scene-wrap { border-left:3px solid #111; }
+    .scene-label { padding:8px; text-align:center; font-weight:800; border-bottom:2px solid #111; }
+    .scene { height: 340px; display: grid; place-items: center; perspective: 850px; overflow: hidden; touch-action: none; user-select: none; cursor: grab; }
+    .scene.dragging, .scene.dragging .voxel { cursor: grabbing; }
+    .cube { position: relative; width: 0; height: 0; transform-style: preserve-3d; transform: rotateX(-24deg) rotateY(-31deg); }
+    .voxel { position: absolute; width: var(--cell); height: var(--cell); padding:0; border:0; background:transparent; transform-style: preserve-3d; transition: opacity .2s; }
+    .voxel:not(:disabled) { cursor:pointer; }
+    .voxel:disabled { pointer-events: none; }
+    .voxel span { position: absolute; display: grid; place-items: center; width: var(--cell); height: var(--cell); border: 3px solid #111; background: #fff; font-weight: 900; font-size: var(--font); backface-visibility: hidden; }
+    .voxel .front { transform: translateZ(var(--half)); }
+    .voxel .back { transform: rotateY(180deg) translateZ(var(--half)); }
+    .voxel .right { transform: rotateY(90deg) translateZ(var(--half)); }
+    .voxel .left { transform: rotateY(-90deg) translateZ(var(--half)); }
+    .voxel .top { transform: rotateX(90deg) translateZ(var(--half)); }
+    .voxel .bottom { transform: rotateX(-90deg) translateZ(var(--half)); }
+    .voxel.available span { box-shadow: inset 0 0 0 5px #0045c8; }
+    .voxel.correct span { background: #ffdb00; }
+    button { border: 2px solid #111; background: #fff; color: #111; padding: 8px 12px; font: inherit; font-weight: 800; cursor: pointer; }
+    button:disabled { opacity: .45; cursor: default; }
+    .voxel:disabled:not(.empty) { opacity: 1; }
+    .voxel.empty { opacity: .12; }
+    button:focus-visible { outline: 3px solid #0045c8; outline-offset: 2px; }
+    .stats { display: flex; justify-content:center; gap: 18px; padding: 12px 16px; border-bottom: 3px solid #111; font-weight: 800; background:#0045c8; color:#fff; }
+    .actions { display: flex; justify-content:center; gap: 8px; padding: 0 16px 20px; }
+    .actions button { background: #cf1018; color: #fff; }
+    .hint { margin: 0; padding: 0 16px 18px; line-height: 1.6; text-align:center; }
+    dialog { width: min(360px, 90vw); border: 4px solid #111; padding: 24px; text-align: center; }
+    dialog::backdrop { background: #1119; }
+    dialog button { background: #ffdb00; }
+    footer { margin-top: 12px; height: 18px; border: 3px solid #111; background: linear-gradient(90deg,#111 0 12%,#cf1018 12% 49%,#0045c8 49% 73%,#ffdb00 73%); }
+    @media (max-width: 540px) { .scene-grid { grid-template-columns:1fr; } .scene-wrap + .scene-wrap { border-left:0; border-top:3px solid #111; } }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="site-back" href="/play/">← 返回小游戏</a>
+    <header><div class="heading"><h1>3D Number Puzzle</h1><p id="intro">在两层立方网格中滑动数字，按顺序排好 1–7。</p></div></header>
+    <div class="layout">
+      <section class="panel scene-panel" aria-label="立体预览">
+        <div class="scene-title"><span>立体棋盘</span><div class="board-switch" aria-label="选择棋盘"><button data-board="2" class="active" aria-pressed="true">2 × 2 × 2</button><button data-board="3" aria-pressed="false">3 × 3 × 3</button></div></div>
+        <div class="stats"><span>步数 <span id="moves">0</span></span><span>时间 <span id="seconds">0</span>s</span></div>
+        <div class="layer-switch" id="layer-switch" role="group" aria-label="选择显示层，可多选" hidden><span>显示层</span><button data-layer="all" class="active" aria-pressed="true">全部</button><button data-layer="2" aria-pressed="false">前</button><button data-layer="1" aria-pressed="false">中</button><button data-layer="0" aria-pressed="false">后</button></div>
+        <div class="scene-grid">
+          <div class="scene-wrap"><div class="scene-label">当前棋盘</div><div class="scene"><div class="cube" id="cube"></div></div></div>
+          <div class="scene-wrap"><div class="scene-label">复原形态</div><div class="scene"><div class="cube" id="goal-cube"></div></div></div>
+        </div>
+        <div class="actions"><button id="undo">撤销</button><button id="shuffle">洗牌</button></div>
+        <p class="hint">黄色方块已在正确位置；蓝色内框表示可以移动。点击方块移入相邻空格，拖动棋盘可自由旋转。3 × 3 × 3 棋盘可多选显示层，红点标出空格所在层。</p>
+      </section>
+    </div>
+    <footer aria-hidden="true"></footer>
+  </main>
+  <dialog id="won"><h2>恭喜通关！</h2><p id="result"></p><button id="again">再来一局</button></dialog>
+  <script>
+    let size = 2;
+    let goal = [1, 2, 3, 4, 5, 6, 7, 0];
+    let visibleLayers = null;
+    const cube = document.querySelector('#cube');
+    const goalCube = document.querySelector('#goal-cube');
+    const movesDisplay = document.querySelector('#moves');
+    const secondsDisplay = document.querySelector('#seconds');
+    const undoButton = document.querySelector('#undo');
+    const won = document.querySelector('#won');
+    const history = [];
+    let tiles, empty, startTime, timer, rotation = -31, tilt = -24;
+
+    function neighbor(a, b) {
+      const ax = a % size, ay = Math.floor(a / size) % size, az = Math.floor(a / (size * size));
+      const bx = b % size, by = Math.floor(b / size) % size, bz = Math.floor(b / (size * size));
+      return Math.abs(ax - bx) + Math.abs(ay - by) + Math.abs(az - bz) === 1;
+    }
+    function swap(index) {
+      [tiles[empty], tiles[index]] = [tiles[index], tiles[empty]];
+      empty = index;
+    }
+    function completed() {
+      return tiles.every((value, index) => value === goal[index]);
+    }
+    function renderCube(container, values, interactive) {
+      container.replaceChildren();
+      values.forEach((number, index) => {
+        const layer = Math.floor(index / (size * size));
+        if (visibleLayers !== null && !visibleLayers.has(layer)) return;
+        const voxel = document.createElement('button');
+        voxel.type = 'button';
+        voxel.className = number ? `voxel${interactive && neighbor(index, empty) ? ' available' : ''}${interactive && number === goal[index] ? ' correct' : ''}` : 'voxel empty';
+        voxel.disabled = !interactive || !number || !neighbor(index, empty);
+        voxel.setAttribute('aria-label', number ? `数字 ${number}` : '空格');
+        if (interactive) voxel.onclick = () => move(index);
+        const cell = size === 2 ? 78 : 56;
+        const pitch = size === 2 ? 88 : 64;
+        const depthPitch = size === 2 ? 104 : 76;
+        const x = ((index % size) - (size - 1) / 2) * pitch - cell / 2;
+        const y = ((Math.floor(index / size) % size) - (size - 1) / 2) * pitch - cell / 2;
+        const centerLayer = visibleLayers === null ? (size - 1) / 2
+          : [...visibleLayers].reduce((sum, selected) => sum + selected, 0) / visibleLayers.size;
+        const z = (layer - centerLayer) * depthPitch;
+        voxel.style.setProperty('--cell', `${cell}px`);
+        voxel.style.setProperty('--half', `${cell / 2}px`);
+        voxel.style.setProperty('--font', `${size === 2 ? 28 : 20}px`);
+        voxel.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
+        for (const face of ['front', 'back', 'right', 'left', 'top', 'bottom']) {
+          const side = document.createElement('span');
+          side.className = face;
+          side.textContent = number || '';
+          voxel.append(side);
+        }
+        container.append(voxel);
+      });
+    }
+    function draw() {
+      renderCube(cube, tiles, true);
+      for (const button of document.querySelectorAll('[data-layer]')) {
+        button.classList.toggle('has-empty', button.dataset.layer !== 'all' && Number(button.dataset.layer) === Math.floor(empty / (size * size)));
+      }
+      movesDisplay.textContent = history.length;
+      undoButton.disabled = history.length === 0;
+    }
+    function tick() {
+      secondsDisplay.textContent = Math.floor((performance.now() - startTime) / 1000);
+    }
+    function move(index) {
+      if (!neighbor(index, empty) || !tiles[index] || completed()) return;
+      if (startTime === null) {
+        startTime = performance.now();
+        timer = setInterval(tick, 250);
+      }
+      history.push(empty);
+      swap(index);
+      draw();
+      if (completed()) {
+        tick();
+        clearInterval(timer);
+        document.querySelector('#result').textContent = `步数 ${history.length} · 用时 ${secondsDisplay.textContent} 秒`;
+        won.showModal();
+      }
+    }
+    function shuffle() {
+      clearInterval(timer);
+      startTime = null;
+      secondsDisplay.textContent = 0;
+      history.length = 0;
+      tiles = [...goal];
+      empty = goal.length - 1;
+      let previous = -1;
+      for (let step = 0; step < (size === 2 ? 48 : 180) || completed(); step += 1) {
+        const options = goal.flatMap((_, index) => neighbor(index, empty) && index !== previous ? [index] : []);
+        previous = empty;
+        swap(options[Math.floor(Math.random() * options.length)]);
+      }
+      draw();
+    }
+    document.querySelector('#shuffle').onclick = shuffle;
+    undoButton.onclick = () => {
+      if (!history.length) return;
+      swap(history.pop());
+      draw();
+    };
+    document.querySelector('#again').onclick = () => { won.close(); shuffle(); };
+    function orient() {
+      const transform = `rotateX(${tilt}deg) rotateY(${rotation}deg)`;
+      cube.style.transform = transform;
+      goalCube.style.transform = transform;
+    }
+    function updateLayerButtons() {
+      for (const button of document.querySelectorAll('[data-layer]')) {
+        const active = button.dataset.layer === 'all' ? visibleLayers === null
+          : visibleLayers !== null && visibleLayers.has(Number(button.dataset.layer));
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', active);
+      }
+    }
+    function selectBoard(nextSize) {
+      size = nextSize;
+      goal = [...Array(size ** 3 - 1)].map((_, index) => index + 1).concat(0);
+      visibleLayers = null;
+      document.querySelector('#intro').textContent = `在 ${size} × ${size} × ${size} 立方网格中滑动数字，按顺序排好 1–${goal.length - 1}。`;
+      document.querySelector('#layer-switch').hidden = size === 2;
+      for (const button of document.querySelectorAll('[data-board]')) {
+        const active = Number(button.dataset.board) === size;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', active);
+      }
+      updateLayerButtons();
+      renderCube(goalCube, goal, false);
+      shuffle();
+    }
+    for (const button of document.querySelectorAll('[data-board]')) {
+      button.onclick = () => { if (Number(button.dataset.board) !== size) selectBoard(Number(button.dataset.board)); };
+    }
+    for (const button of document.querySelectorAll('[data-layer]')) {
+      button.onclick = () => {
+        if (button.dataset.layer === 'all') {
+          visibleLayers = null;
+        } else {
+          const selected = Number(button.dataset.layer);
+          if (visibleLayers === null) visibleLayers = new Set([selected]);
+          else if (visibleLayers.has(selected)) {
+            if (visibleLayers.size > 1) visibleLayers.delete(selected);
+          } else visibleLayers.add(selected);
+        }
+        updateLayerButtons();
+        renderCube(goalCube, goal, false);
+        draw();
+      };
+    }
+    for (const scene of document.querySelectorAll('.scene')) {
+      let drag = null;
+      let suppressClick = false;
+      scene.addEventListener('pointerdown', event => {
+        if (event.button !== 0) return;
+        suppressClick = false;
+        drag = { id: event.pointerId, startX: event.clientX, startY: event.clientY,
+          x: event.clientX, y: event.clientY, moved: false };
+      });
+      scene.addEventListener('pointermove', event => {
+        if (!drag || event.pointerId !== drag.id) return;
+        if (!drag.moved && Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) < 5) return;
+        if (!drag.moved) {
+          drag.moved = true;
+          scene.classList.add('dragging');
+          scene.setPointerCapture(event.pointerId);
+        }
+        rotation += (event.clientX - drag.x) * .6;
+        tilt -= (event.clientY - drag.y) * .6;
+        drag.x = event.clientX;
+        drag.y = event.clientY;
+        orient();
+      });
+      function endDrag(event) {
+        if (!drag || event.pointerId !== drag.id) return;
+        suppressClick = drag.moved;
+        drag = null;
+        scene.classList.remove('dragging');
+        if (scene.hasPointerCapture(event.pointerId)) scene.releasePointerCapture(event.pointerId);
+      }
+      scene.addEventListener('pointerup', endDrag);
+      scene.addEventListener('pointercancel', endDrag);
+      scene.addEventListener('click', event => {
+        if (!suppressClick) return;
+        event.preventDefault();
+        event.stopPropagation();
+        suppressClick = false;
+      }, true);
+    }
+    selectBoard(2);
+  </script>
+</body>
+</html>
