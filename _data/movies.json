@@ -111,5 +111,16 @@
     "poster": "/assets/images/movies/battle-of-taierzhuang.png",
     "durationSource": "用户提供",
     "color": "#823b2e"
+  },
+  {
+    "title": "完美的世界",
+    "english": "A Perfect World",
+    "director": "[美]克林特·伊斯特伍德",
+    "date": "2026-11-27",
+    "minutes": 138,
+    "url": "https://movie.douban.com/subject/1300992/",
+    "poster": "https://www.impawards.com/1993/posters/perfect_world_xxlg.jpg",
+    "durationSource": "https://catalog.afi.com/Film/67724-A-PERFECTWORLD",
+    "color": "#8a6744"
   }
 ]
