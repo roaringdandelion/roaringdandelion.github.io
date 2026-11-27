@@ -61,7 +61,16 @@
     dialog button { background: #ffdb00; }
     footer { margin-top: 12px; height: 18px; border: 3px solid #111; background: linear-gradient(90deg,#111 0 12%,#cf1018 12% 49%,#0045c8 49% 73%,#ffdb00 73%); }
     @media (max-width: 540px) { .scene-grid { grid-template-columns:1fr; } .scene-wrap + .scene-wrap { border-left:0; border-top:3px solid #111; } }
-  </style>
+  
+/* Match Number Puzzle page typography. Cube numerals retain responsive sizing. */
+body{font-family:system-ui,sans-serif;font-size:16px;line-height:1.5}
+.site-back{font-size:16px}
+.heading h1{font-size:clamp(26px,6vw,52px);line-height:1.1}
+.heading p{font-size:16px}
+button,.scene-title,.stats,.scene-label,.layer-switch,.hint{font-family:system-ui,sans-serif;font-size:16px}
+.dialog h2,dialog h2{font-size:24px}
+dialog p,dialog button{font-size:16px}
+</style>
 </head>
 <body>
   <main>
