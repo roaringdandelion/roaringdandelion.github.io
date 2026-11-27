@@ -70,12 +70,13 @@ body{font-family:system-ui,sans-serif;font-size:16px;line-height:1.5}
 button,.scene-title,.stats,.scene-label,.layer-switch,.hint{font-family:system-ui,sans-serif;font-size:16px}
 .dialog h2,dialog h2{font-size:24px}
 dialog p,dialog button{font-size:16px}
-</style>
+    .heading small { display: block; font-size: .8em; font-weight: 850; color: #0045c8; }
+  </style>
 </head>
 <body>
   <main>
     <a class="site-back" href="/play/">← 返回小游戏</a>
-    <header><div class="heading"><h1>3D Number Puzzle</h1><p id="intro">在两层立方网格中滑动数字，按顺序排好 1–7。</p></div></header>
+    <header><div class="heading"><small>MINI ARCADE / 03</small><h1>3D Number Puzzle</h1><p id="intro">在两层立方网格中滑动数字，按顺序排好 1–7。</p></div></header>
     <div class="layout">
       <section class="panel scene-panel" aria-label="立体预览">
         <div class="scene-title"><span>立体棋盘</span><div class="board-switch" aria-label="选择棋盘"><button data-board="2" class="active" aria-pressed="true">2 × 2 × 2</button><button data-board="3" aria-pressed="false">3 × 3 × 3</button></div></div>
